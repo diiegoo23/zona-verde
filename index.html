@@ -1,0 +1,1321 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zona Verde</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#efece4;--fg:#1c1f24;--card:#fbfaf6;--line:#d3cfc3;--mut:#686c73;--acc:#e0a010;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14171b;--fg:#efece4;--card:#1e2227;--line:#333a42;--mut:#9aa0a8}}
+:root[data-theme="dark"]{--bg:#14171b;--fg:#efece4;--card:#1e2227;--line:#333a42;--mut:#9aa0a8}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:'Barlow Condensed',system-ui,sans-serif;font-weight:500;font-size:18px}
+h1{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:clamp(40px,9vw,72px);margin:0}
+button{font:inherit;font-weight:700;cursor:pointer}
+.wrap{max-width:960px;margin:0 auto;padding:20px 16px 40px}
+.sub{color:var(--mut);margin:6px 0 14px;max-width:70ch}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:10px;padding:10px;text-align:left;color:var(--fg)}
+.card[aria-pressed=true]{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
+.card .top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.dot{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:Anton,sans-serif;font-size:16px;flex:none}
+.card b{font-size:20px;display:block;line-height:1}.card small{color:var(--mut);font-size:15px}
+.st{display:grid;grid-template-columns:70px 1fr 24px;align-items:center;gap:6px;font-size:14px;margin:1px 0}
+.st i{height:5px;border-radius:3px;background:var(--line);position:relative;overflow:hidden}
+.st i:after{content:"";position:absolute;inset:0;width:var(--v);background:var(--acc)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0 0}
+.row button{background:var(--card);color:var(--fg);border:2px solid var(--line);border-radius:8px;padding:8px 18px;font-size:19px}
+.row button[aria-pressed=true]{background:var(--acc);color:#1c1f24;border-color:var(--acc)}
+.row span{color:var(--mut)}
+.pl{display:grid;grid-template-columns:34px 1fr auto;gap:4px 10px;align-items:center;width:100%;text-align:left;background:var(--card);color:var(--fg);border:2px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:6px}.pl[aria-pressed=true]{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}.pl .dot{width:34px;height:34px;font-size:13px}.pl .nm b{font-size:19px;display:block;line-height:1.05}.pl small{color:var(--mut);font-size:14px}.pl .ov{font-family:Anton,sans-serif;font-size:24px}.pl .ch{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:2px 10px;font-size:13px;color:var(--mut)}.pl .ch i{font-style:normal}.pl .ch b{color:var(--fg)}#fq,#ftm,#fpos,#fleg,#fsort{background:var(--card);color:var(--fg);border:2px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit}#fq{flex:1;min-width:180px}#best:disabled{opacity:.4}#mine button{border-width:3px}
+.go{margin-top:16px;background:var(--acc);color:#1c1f24;border:0;border-radius:8px;padding:12px 28px;font-size:24px;font-family:Anton,sans-serif;font-weight:400}
+.go:disabled{opacity:.4;cursor:default}
+#game{display:none;height:100%;flex-direction:column;align-items:center;padding:8px;gap:6px;box-sizing:border-box;position:relative}
+#hud{width:min(100%,420px);display:flex;justify-content:space-between;align-items:center}
+#hud .n{display:flex;flex-direction:column;line-height:1.05;flex:1;font-size:17px}#hud .n small{color:var(--mut);font-size:13px}
+#hud .sc{font-family:Anton,sans-serif;font-size:34px;padding:0 10px}
+#cv{height:min(calc(100dvh - 120px),150vw);aspect-ratio:2/3;max-width:100%;border-radius:10px;touch-action:none;display:block}
+#tip{color:var(--mut);font-size:15px;text-align:center;min-height:18px}
+#end,#pause,#subs{position:absolute;inset:0;background:rgba(10,12,14,.82);display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#efece4;text-align:center}
+#end .go,#pause .go,#subs .go{margin:0}#subs{overflow:auto;justify-content:flex-start;padding:16px 0}#subs h2{margin:8px 0 2px;font-size:20px}#subs .sp{background:#222;color:#fff;border:2px solid #555;border-radius:8px;padding:6px 10px;font-size:17px;display:grid;grid-template-columns:1fr 70px 30px;gap:8px;align-items:center;width:min(380px,92vw);text-align:left}#subs .sp.on{border-color:var(--acc)}#subs .sp small{color:#9aa0a8}#subs .eb{height:6px;background:#444;border-radius:3px;overflow:hidden}#subs .eb i{display:block;height:100%}#pause label{display:flex;gap:10px;align-items:center}#tb{position:absolute;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);display:none;flex-direction:column;gap:12px;align-items:center;z-index:3}#tb button{border-radius:50%;border:2px solid rgba(255,255,255,.7);background:rgba(20,24,28,.45);color:#fff;font-family:Anton,sans-serif;font-size:16px;touch-action:none;user-select:none;-webkit-user-select:none}#bA{width:78px;height:78px}#bB{width:58px;height:58px;font-size:14px}#bC{width:46px;height:46px;font-size:11px}#keys{position:fixed;inset:0;background:rgba(10,12,14,.94);display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#efece4;text-align:center;z-index:20;overflow:auto;padding:20px;box-sizing:border-box}#keys .kr{display:flex;gap:10px;align-items:center;justify-content:space-between;width:min(360px,100%)}#keys .kr button{min-width:120px;background:#222;color:#fff;border:2px solid #666;border-radius:8px;padding:6px 10px;font-size:18px}#keys .kr button.on{border-color:var(--acc)}.oc{display:grid;grid-template-columns:1fr auto auto;gap:6px 12px;align-items:center;background:var(--card);border:2px solid var(--line);border-radius:10px;padding:10px;margin-top:8px}.oc small{display:block;color:var(--mut)}.oc button,#utBody .go{background:var(--acc);color:#1c1f24;border:0;border-radius:8px;padding:8px 14px;font-size:18px}.oc button:disabled,#utBody .go:disabled{opacity:.35}
+.pb{display:block;height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:6px}.pb u{display:block;height:100%;background:var(--acc)}
+.dv{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;border:2px solid var(--line);font-family:Anton,sans-serif}.dv.on{background:var(--acc);color:#1c1f24;border-color:var(--acc)}.dv.done{opacity:.4}
+.cards{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.cd{flex:1;min-width:150px;background:var(--card);border:3px solid;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px}.cd .ov{font-family:Anton,sans-serif;font-size:36px}.cd em,.cd small{font-style:normal;font-size:14px;color:var(--mut)}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:10px}.sl{background:var(--card);color:var(--fg);border:2px solid var(--line);border-radius:10px;padding:8px;text-align:left;display:flex;flex-direction:column}.sl.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}.sl small{color:var(--mut)}
+#utBody h2{margin:14px 0 4px;font-size:24px}
+.cd.t0,.sl.t0{background:linear-gradient(145deg,#d29a66,#8a5a33);color:#fff;border-color:#6e4524}
+.cd.t1,.sl.t1{background:linear-gradient(145deg,#e6ebf1,#9aa6b4);color:#1c1f24;border-color:#7d8896}
+.cd.t2,.sl.t2{background:linear-gradient(145deg,#f8dc7a,#d9a019);color:#3a2a00;border-color:#b07f00}
+.cd.t3,.sl.t3{background:linear-gradient(145deg,#8d63ff,#2d1b69);color:#fff;border-color:#c3a8ff;box-shadow:0 0 18px rgba(138,92,246,.7)}
+.cd[class*=" t"] small,.cd[class*=" t"] em,.sl[class*=" t"] small,.sl[class*=" t"] span{color:inherit;opacity:.85}
+.sl.on{border-color:var(--acc)!important;box-shadow:0 0 0 3px var(--acc)}
+.pl.t0{border-left:7px solid #b07a4a}.pl.t1{border-left:7px solid #aab0b8}.pl.t2{border-left:7px solid #e0b020}.pl.t3{border-left:7px solid #8a5cf6}
+.cd.bk{display:grid;place-items:center;font-family:Anton,sans-serif;font-size:48px;background:var(--card);border-color:var(--line);min-height:120px;color:var(--mut)}
+.cd.rv{animation:flip .45s}@keyframes flip{from{transform:rotateY(90deg) scale(.9);opacity:.3}to{transform:none;opacity:1}}
+.cd.t4,.sl.t4{background:linear-gradient(145deg,#ff6a5a,#ffcf5a);color:#2a0a00;border-color:#ff9a5a;box-shadow:0 0 22px rgba(255,120,60,.8)}.pl.t4{border-left:7px solid #ff5a5a}
+#sw{position:absolute;top:6px;left:6px;background:none;border:0;color:var(--mut);font-size:20px;padding:4px 8px;z-index:2}#hud{padding:0 34px;box-sizing:border-box}#pz{position:absolute;top:6px;right:6px;background:none;border:0;color:var(--mut);font-size:15px;padding:6px 8px;z-index:2}#es table{border-collapse:collapse;font-size:16px}#es td,#es th{padding:2px 7px;text-align:center}#es td:first-child{text-align:left}.alt{background:transparent;color:#efece4;border:2px solid #efece4}
+</style><script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script></head><body>
+<div id="home" class="wrap"><h1>Zona Verde</h1><p class="sub">Elige cómo quieres jugar.</p><div class="row"><button class="go" id="hQ">Partido rápido</button><button class="go" id="hU">Ultimate Team</button><button class="go" id="hO">Partido online</button></div></div>
+<div id="onl" class="wrap" style="display:none"><div class="row"><button id="onHome">← Inicio</button></div><h1 style="font-size:42px">Partido online</h1><p class="sub" id="onNote"></p><div id="onBody"></div></div>
+<div id="ut" class="wrap" style="display:none"><div class="row" style="justify-content:space-between"><h1 style="font-size:42px">Ultimate Team</h1><b id="utTok" style="font-size:22px"></b></div><div class="row" id="utTabs"><button data-t="obj">Objetivos</button><button data-t="div">Temporadas</button><button data-t="tour">Torneos</button><button data-t="surv">Supervivencia</button><button data-t="duel">Duelos</button><button data-t="shop">Tienda</button><button data-t="team">Mi equipo</button><button id="utHome">← Inicio</button></div><div id="utBody"></div></div>
+<div id="menu" class="wrap" style="display:none">
+  <h1>Zona Verde</h1>
+  <p class="sub">Elige modo, dificultad y tu equipo. Con 3v3 puedes elegir 1 jugador de banquillo y con 5v5 hasta 3. Los controles se pueden cambiar en “Controles”. Por defecto: WASD o flechas para moverte, Espacio para tirar (en defensa roba o tapona), F para pasar (en defensa cambia de jugador), Q para regatear y P para pausar. En móvil: arrastra a la izquierda para moverte, desliza hacia arriba a la derecha para regatear y usa los botones Tirar y Pase.</p>
+  <div class="row"><button id="mHome">← Inicio</button></div>
+  <div class="row" id="mod"><button data-m="1">1v1</button><button data-m="2">2v2</button><button data-m="3">3v3</button><button data-m="5">5v5</button><span id="cnt"></span></div>
+  <div class="row" id="dif"><button data-d="0">Fácil</button><button data-d="1">Normal</button><button data-d="2">Difícil</button></div>
+  <div class="row" id="swr"><button data-s="auto">Cambio automático</button><button data-s="manual">Cambio manual</button></div>
+  <div class="row"><button id="kb">Controles del teclado</button></div>
+  <div class="row" id="mine"></div>
+  <button class="go" id="play">Jugar a 11</button>
+  <div class="row"><input id="fq" type="search" placeholder="Buscar jugador o equipo"><select id="ftm"></select><select id="fpos"><option value="">Todas las posiciones</option><option>PG</option><option>SG</option><option>SF</option><option>PF</option><option>C</option></select><select id="fleg"><option value="cur">Actuales</option><option value="leg">Leyendas</option><option value="all">Todos</option></select><select id="fsort"></select><button id="best" disabled>Mejores del equipo</button></div>
+  <div class="sub" id="res"></div>
+  <div id="list"></div>
+</div>
+<div id="game">
+  <div id="hud"><div class="n"><b id="n1"></b><small>Tú</small></div><div class="sc"><span id="s1">0</span> : <span id="s2">0</span></div><div class="n" style="text-align:right"><b id="n2"></b><small>Rival</small></div></div>
+  <canvas id="cv" width="800" height="1200"></canvas>
+  <div id="tip"></div>
+  <div id="tb"><button id="bC">Banq.</button><button id="bB">Pase</button><button id="bA">Tirar</button></div>
+  <button id="sw" aria-label="Cambiar jugador">⇄</button>
+  <button id="pz" aria-label="Pausa">❚❚</button>
+  <div id="pause"><h1>Pausa</h1><button class="go" id="resume">Seguir</button><label><input type="checkbox" id="snd"> Sonido</label><label>Sensibilidad del dedo <input type="range" id="sens" min="20" max="80"></label><label><input type="checkbox" id="tbs"> Botones táctiles</label><button class="go alt" id="kb2">Controles</button><button class="go alt" id="bn2">Banquillo</button><label><input type="checkbox" id="aut"> Cambios automáticos de mi equipo</label><label>Cambio de jugador <select id="swm"><option value="auto">Automático</option><option value="manual">Manual (botón)</option></select></label><button class="go alt" id="quit">Abandonar</button></div>
+  <div id="subs"><h1>Banquillo</h1><div id="sc"></div><p class="sub" style="color:#9aa0a8">Toca un jugador en pista y luego uno del banquillo para cambiarlos.</p><button class="go" id="sclose">Seguir</button></div>
+  <div id="end"><h1 id="et"></h1><div id="es"></div><button class="go" id="again">Revancha</button><button class="go alt" id="back">Cambiar equipo</button></div>
+</div>
+<div id="keys"><h1>Controles</h1><div id="kl"></div><p class="sub">Pulsa un botón y luego la tecla que quieras. Las flechas siempre mueven.</p><p class="sub">Mando (PlayStation, Xbox u otros): stick izquierdo o cruceta para moverte, A/✕ tirar, robar o taponar, B/○ regate, X/□ pase o cambio de jugador, Y/△ banquillo y Start/Options pausa.</p><button class="go" id="kdef">Restaurar</button><button class="go alt" id="kback">Volver</button></div>
+<script>
+let NET=null,NETM=null,duTimer=null;
+// Si subes el juego a GitHub Pages, pega aquí la URL de tu Firebase Realtime Database (opcional, para duelos con resultados guardados)
+const FB_URL='';
+// ---- Datos editables (estadísticas aproximadas, puedes cambiarlas) ----
+// Datos 2026-27: equipo y posición del CSV de 26-27; estadísticas calculadas con el CSV de 25-26.
+const TEAMS={"ATL":["Hawks","#e03a3e"],"BOS":["Celtics","#007a33"],"BRK":["Nets","#5a6068"],"CHI":["Bulls","#ce1141"],"CHO":["Hornets","#00788c"],"CLE":["Cavaliers","#860038"],"DAL":["Mavericks","#00538c"],"DEN":["Nuggets","#4a90d9"],"DET":["Pistons","#1d42ba"],"GSW":["Warriors","#1d428a"],"HOU":["Rockets","#b5121b"],"IND":["Pacers","#d19b00"],"LAC":["Clippers","#12529a"],"LAL":["Lakers","#6b3fa0"],"MEM":["Grizzlies","#5d76a9"],"MIA":["Heat","#98002e"],"MIL":["Bucks","#2e7d4f"],"MIN":["Timberwolves","#236192"],"NOP":["Pelicans","#b4975a"],"NYK":["Knicks","#f58426"],"OKC":["Thunder","#007ac1"],"ORL":["Magic","#0077c0"],"PHI":["76ers","#006bb6"],"PHO":["Suns","#e56020"],"POR":["Trail Blazers","#c4373d"],"SAC":["Kings","#5a2d81"],"SAS":["Spurs","#6b7280"],"TOR":["Raptors","#ce1141"],"UTA":["Jazz","#4b2e83"],"WAS":["Wizards","#002b5c"]};
+// Ajustes manuales por nombre (sobrescriben lo calculado). Añade aquí los tuyos.
+const EDIT={"Stephen Curry":{"spd":78},"LeBron James":{"spd":80},"Giannis Antetokounmpo":{"spd":86},"Nikola Jokić":{"spd":52},"Luka Dončić":{"spd":66},"Kevin Durant":{"spd":72},"Victor Wembanyama":{"spd":70},"Shai Gilgeous-Alexander":{"spd":86},"Jayson Tatum":{"spd":78},"Anthony Edwards":{"spd":92},"Jalen Brunson":{"spd":76},"Ja Morant":{"spd":95},"Tyrese Haliburton":{"three":85,"mid":82,"dunk":45,"def":62,"steal":78,"spd":80,"block":20,"drib":90,"pass":97,"reb":40},"Damian Lillard":{"three":92,"mid":85,"dunk":50,"def":45,"steal":55,"spd":75,"block":15,"drib":90,"pass":82,"reb":35},"Kyrie Irving":{"three":88,"mid":92,"dunk":60,"def":55,"steal":68,"spd":84,"block":25,"drib":98,"pass":78,"reb":40},"Fred VanVleet":{"three":80,"mid":78,"dunk":35,"def":70,"steal":70,"spd":72,"block":20,"drib":82,"pass":82,"reb":35}};
+const RAW=[["Luka Dončić","LAL","PG",77,81,74,56,73,83,76,33,86,99,74],["Anthony Edwards","MIN","SG",5,92,72,54,68,77,82,42,69,63,56],["Ty Jerome","MEM","SG",59,64,56,44,49,54,59,35,56,59,42],["Stephen Curry","GSW","PG",30,87,85,48,59,67,76,30,78,75,46],["Tyrese Maxey","PHI","PG",46,77,81,44,71,93,77,42,82,90,50],["Jayson Tatum","BOS","PF",0,61,61,55,65,68,65,29,53,64,78],["Giannis Antetokounmpo","MIA","PF",34,63,59,90,69,61,58,39,60,72,89],["Zach LaVine","SAC","SG",18,84,75,47,53,54,71,27,63,52,41],["Shai Gilgeous-Alexander","OKC","PG",2,84,86,57,67,77,87,42,83,90,51],["Jalen Brunson","NYK","PG",11,79,75,44,53,58,73,21,82,91,44],["Brandon Miller","CHO","SF",97,83,77,52,62,64,73,39,59,59,55],["Cooper Flagg","DAL","SF",47,50,69,56,70,70,73,45,62,68,68],["Victor Wembanyama","SAS","C",1,72,76,84,99,64,55,99,46,57,99],["Donovan Mitchell","CLE","SG",9,78,82,55,63,80,78,27,73,78,53],["Paolo Banchero","ORL","PF",7,58,64,69,66,54,71,36,57,71,79],["Alperen Şengün","HOU","C",51,66,56,83,73,70,66,51,51,80,83],["Keyonte George","UTA","PG",31,81,78,46,58,67,79,27,80,86,47],["Austin Reaves","LAL","SG",62,76,79,57,61,67,77,30,71,76,54],["Pascal Siakam","IND","PF",5,77,56,68,63,67,63,30,55,60,67],["Tyler Herro","MIL","SG",20,80,77,47,58,54,79,30,67,66,55],["Devin Booker","PHO","SG",61,66,79,53,55,58,69,27,73,80,49],["Michael Porter Jr.","BRK","SF",32,79,77,60,63,67,79,27,60,56,70],["Cade Cunningham","DET","PG",14,74,68,47,69,77,79,42,88,99,59],["Yaxel Lendeborg","GSW","SF",8,74,63,77,64,64,74,36,62,64,85],["Jamal Murray","DEN","PG",85,99,79,43,59,61,82,30,83,93,52],["Julius Randle","BRK","PF",33,59,68,72,61,67,63,24,56,70,68],["Kevin Durant","HOU","PF",7,95,80,67,65,58,55,45,58,68,59],["Deni Avdija","POR","SF",92,58,71,65,64,58,71,36,68,84,69],["Paul George","BOS","PF",17,86,65,56,68,86,58,30,52,59,58],["RJ Barrett","TOR","SF",8,70,59,60,57,54,74,27,59,59,58],["Nikola Jokić","DEN","C",15,81,79,93,80,77,63,42,63,99,99],["Anthony Davis","WAS","PF",28,56,59,71,78,65,60,66,50,52,92],["Tyrese Haliburton","IND","PG",40,75,71,51,66,74,79,42,87,99,53],["Karl-Anthony Towns","NYK","C",64,77,77,84,70,61,55,33,44,56,99],["Zion Williamson","NOP","PF",44,52,62,79,60,64,67,33,52,56,61],["Damian Lillard","POR","PG",9,82,62,43,56,64,72,20,74,70,51],["Norman Powell","CHI","SG",24,83,71,50,57,67,74,24,64,54,46],["Darius Acuff Jr.","SAC","PG",45,53,58,35,54,58,80,27,76,76,41],["Joel Embiid","PHI","C",66,68,77,82,68,51,51,54,48,63,74],["Darius Garland","LAC","PG",6,88,69,39,53,64,77,24,79,90,38],["Caleb Wilson","CHI","PF",15,54,62,72,79,90,64,60,50,48,70],["Jaylen Brown","PHI","SF",55,74,71,61,64,64,68,30,66,72,69],["Trae Young","WAS","PG",16,58,56,45,47,52,62,30,64,74,38],["Evan Mobley","CLE","PF",96,58,50,79,76,54,71,69,52,59,83],["Scottie Barnes","TOR","PF",70,60,69,70,78,77,62,63,57,76,73],["Nickeil Alexander-Walker","ATL","SG",16,89,81,47,61,74,74,33,66,63,45],["Jalen Johnson","ATL","SF",16,77,68,60,72,70,78,30,70,93,92],["Kawhi Leonard","TOR","SF",50,84,84,63,71,93,72,30,63,61,66],["Franz Wagner","ORL","SF",55,70,70,60,58,61,77,27,59,59,57],["AJ Dybantsa","WAS","SF",11,59,61,60,46,42,56,36,53,50,44],["Domantas Sabonis","SAC","C",36,52,56,78,61,57,53,27,44,60,88],["Ajay Mitchell","OKC","SG",16,73,73,47,58,70,74,27,64,62,44],["Amen Thompson","HOU","SF",50,33,66,70,68,80,72,36,63,74,75],["Kyrie Irving","DAL","SG",31,72,74,62,65,80,66,42,66,64,44],["Jaime Jaquez Jr.","MIL","SF",32,66,61,57,55,54,76,27,61,69,56],["Dejounte Murray","NOP","PG",18,56,57,43,55,65,66,32,62,68,51],["OG Anunoby","NYK","PF",47,82,70,68,68,83,72,39,49,48,57],["Immanuel Quickley","TOR","PG",81,79,64,41,58,74,76,21,77,84,49],["Stephon Castle","SAS","PG",0,67,58,50,59,67,84,27,80,96,58],["Dylan Harper","SAS","SG",11,70,60,48,54,58,78,27,64,64,45],["Naz Reid","CHO","C",39,78,60,69,68,64,55,48,40,50,64],["Duncan Robinson","DET","SF",90,95,64,54,51,51,72,27,54,50,40],["Andrew Nembhard","IND","SG",94,78,67,44,52,61,77,21,74,93,41],["CJ McCollum","ATL","PG",84,81,63,42,56,58,73,33,73,69,44],["Davion Mitchell","MIA","PG",63,84,52,41,54,64,86,24,76,89,40],["Toumani Camara","POR","PF",0,82,57,67,60,67,72,30,48,51,57],["Jaren Jackson Jr.","UTA","C",84,78,67,69,72,67,63,60,41,49,61],["Ja Morant","POR","PG",12,45,66,41,54,60,70,30,75,90,44],["Jabari Smith Jr.","HOU","PF",65,79,63,64,65,54,61,45,48,46,69],["Lauri Markkanen","UTA","PF",90,74,82,74,63,64,60,33,52,48,69],["P.J. Washington","DAL","PF",29,68,50,64,70,64,72,51,47,46,70],["Kyshawn George","WAS","SG",51,85,63,43,65,64,74,45,66,69,57],["James Harden","CLE","PG",17,83,77,46,61,67,69,30,84,99,55],["Jaden McDaniels","MIN","PF",7,90,69,64,65,67,70,48,49,52,51],["LeBron James","PHI","SF",23,59,63,60,67,70,61,36,68,88,63],["De'Aaron Fox","SAS","PG",58,66,65,46,59,70,86,27,78,86,48],["Cameron Boozer","MEM","PF",16,66,54,46,72,48,70,42,54,68,93],["Grayson Allen","CHO","SG",12,73,69,46,59,77,77,27,65,64,42],["Obi Toppin","IND","PF",68,59,62,58,48,46,57,27,45,46,48],["Keaton Wagler","LAC","SG",84,78,48,26,61,74,81,27,64,61,51],["Walker Kessler","LAL","C",2,51,47,55,51,50,45,49,42,45,54],["Jaylen Wells","MEM","SG",15,76,58,46,52,61,79,21,59,47,44],["Dillon Brooks","PHO","SF",4,73,68,51,55,64,76,24,56,48,46],["Brandin Podziemski","GSW","SG",62,83,63,47,59,67,79,24,64,63,57],["Matas Buzelis","CHI","SF",40,71,65,58,70,54,66,63,55,50,61],["Aaron Wiggins","ATL","SG",71,75,53,41,55,61,81,30,58,48,43],["Desmond Bane","ORL","SG",95,85,79,51,58,64,75,33,67,66,50],["Tristan Da Silva","ORL","SF",39,82,70,50,55,61,74,27,52,46,47],["Bam Adebayo","MIA","C",24,56,64,75,73,70,65,39,44,58,90],["Ace Bailey","UTA","SF",57,72,58,53,58,58,76,39,54,48,51],["Paul Reed","DET","C",12,52,53,81,61,61,57,45,35,43,53],["Terrence Shannon Jr.","MIN","SG",14,69,53,39,43,42,63,24,52,42,32],["Saddiq Bey","NOP","SF",21,80,68,58,56,61,77,21,57,53,60],["Jalen Green","PHO","SG",73,58,59,43,58,67,75,27,63,56,46],["Jrue Holiday","POR","PG",27,84,68,44,55,64,75,21,77,86,53],["Brook Lopez","LAC","C",74,75,52,62,62,51,52,54,36,44,46],["Dennis Schröder","CHO","PG",44,67,61,35,52,58,71,24,73,77,40],["Peyton Watson","CLE","SF",6,90,58,54,66,61,70,51,55,50,55],["Miles Bridges","PHO","SF",68,66,69,56,58,51,67,30,58,58,61],["Naji Marshall","DAL","SF",99,47,63,60,57,67,69,21,58,59,54],["Jalen Williams","OKC","SG",56,60,68,48,60,70,77,27,69,76,53],["Wendell Carter Jr.","ORL","C",49,57,65,81,63,58,54,36,39,49,72],["LaMelo Ball","MIN","PG",50,80,71,37,59,70,77,24,81,93,55],["Jalen Smith","CHI","C",99,75,59,77,61,48,54,42,36,43,68],["Jarrett Allen","CLE","C",96,51,60,88,68,64,62,42,39,48,80],["Aaron Nesmith","IND","SF",49,80,59,48,55,51,72,33,54,48,51],["Payton Pritchard","BOS","PG",76,84,73,44,52,54,73,21,75,79,49],["Ja'Kobe Walter","TOR","SG",53,89,56,43,53,64,71,24,56,44,40],["Jonathan Kuminga","MIN","PF",27,70,56,64,56,51,60,27,47,49,60],["Anthony Black","ORL","PG",76,70,56,42,64,77,83,39,71,68,48],["DeMar DeRozan","DEN","SF",40,59,75,55,56,64,64,27,60,65,42],["Ayo Dosunmu","MIN","SG",61,99,71,48,54,58,73,27,64,62,45],["Jalen Duren","DET","C",32,52,68,96,68,58,53,42,41,49,93],["Trey Murphy III","NOP","SF",84,81,80,59,66,80,76,30,61,62,61],["Meleek Thomas","CLE","SG",80,70,57,47,51,59,64,29,54,42,45],["Darryn Peterson","UTA","SG",66,72,53,36,55,64,73,24,61,54,52],["Cedric Coward","MEM","SG",30,70,70,52,57,51,81,30,62,56,62],["Devin Vassell","SAS","SG",30,87,66,42,58,61,75,30,61,54,49],["Derrick Jones Jr.","LAC","SF",85,72,59,58,61,61,74,48,52,44,46],["Derik Queen","NOP","C",93,52,61,70,68,64,55,45,42,62,70],["Derrick White","BOS","SG",50,61,75,44,68,67,68,57,69,76,52],["Aaron Gordon","DEN","PF",78,82,64,69,56,51,68,27,50,52,61],["Fred VanVleet","HOU","PG",68,74,57,35,67,96,74,27,77,89,48],["Daniss Jenkins","DET","PG",8,76,62,33,52,61,75,24,70,69,38],["Dyson Daniels","ATL","SG",46,33,49,56,70,96,85,30,68,79,68],["Chet Holmgren","OKC","C",89,78,72,83,78,51,65,75,40,47,83],["Tre Johnson","WAS","SG",92,74,64,39,52,51,79,27,60,50,41],["Collin Sexton","LAL","SG",7,85,69,48,53,67,76,21,64,60,38],["Kel'el Ware","MIL","C",22,86,61,80,70,58,55,51,35,39,83],["Julian Champagnie","SAS","SF",72,86,72,57,61,58,66,33,52,45,61],["Ryan Rollins","MIL","PG",83,93,66,40,64,80,80,30,76,82,53],["Christian Braun","DEN","SG",98,57,66,58,55,54,70,27,61,55,55],["Precious Achiuwa","SAC","C",17,59,43,77,63,61,60,39,37,44,68],["VJ Edgecombe","PHI","SG",88,76,66,47,64,77,81,33,66,66,60],["Ziaire Williams","LAL","SF",58,68,65,51,59,77,73,30,51,42,38],["Mo Bamba","UTA","C",38,43,42,43,43,41,43,42,41,42,43],["Jared McCain","OKC","SG",47,85,62,37,47,48,80,21,57,45,36],["Brandon Williams","GSW","PG",53,34,65,46,54,61,80,27,71,69,42],["Kyle Kuzma","MIL","PF",51,70,59,64,56,54,64,30,48,52,53],["Tre Jones","CHI","PG",17,56,71,50,57,70,76,24,75,80,43],["Pelle Larsson","MIA","SG",59,66,64,53,52,54,76,24,62,60,46],["Alex Sarr","WAS","C",73,64,55,74,77,58,56,78,42,54,72],["Andrew Wiggins","MIA","SF",74,92,63,55,65,67,70,48,56,54,55],["Reed Sheppard","HOU","PG",45,91,60,34,64,80,76,39,70,66,42],["Bobby Portis","MIA","PF",89,99,54,59,57,51,58,24,46,44,66],["Mikel Brown Jr.","BRK","PG",26,73,42,20,51,54,81,20,71,72,44],["Rui Hachimura","LAC","PF",21,98,51,60,52,51,63,27,44,38,44],["De'Andre Hunter","SAC","SF",26,57,70,52,53,54,67,21,54,49,50],["Moritz Wagner","BRK","C",5,55,51,54,46,44,51,29,37,41,43],["John Collins","DET","PF",31,88,65,71,61,61,62,39,45,40,58],["Tari Eason","HOU","PF",72,79,58,59,63,70,73,33,45,43,65],["Quentin Grimes","LAL","SG",10,68,70,49,57,61,74,30,63,60,46],["Sandro Mamukelashvili","LAL","PF",59,81,63,71,58,58,66,33,46,46,55],["Luke Kennard","PHO","SG",18,99,69,47,49,54,74,21,59,52,38],["Caleb Martin","DAL","SF",40,52,37,46,52,54,74,27,49,44,39],["Bilal Coulibaly","WAS","SF",83,67,55,50,67,74,69,48,55,54,51],["Jerami Grant","MEM","PF",19,87,68,64,56,54,57,36,49,48,46],["Sam Hauser","BOS","PF",33,85,54,59,52,48,70,27,45,43,48],["Leonard Miller","CHI","SF",93,63,58,65,51,45,73,27,50,41,49],["Robert Williams","POR","C",46,52,55,89,69,51,61,63,35,42,70],["Max Christie","DAL","SG",36,89,69,40,54,51,70,30,60,50,44],["Keldon Johnson","SAS","SF",71,76,66,62,53,51,71,21,53,44,59],["Onyeka Okongwu","ATL","C",83,79,64,75,71,67,62,51,42,57,74],["Trevon Brazile","DEN","PF",7,72,64,80,62,48,70,42,41,32,73],["Yves Missi","NOP","C",1,52,43,76,63,42,62,63,35,44,61],["Nolan Traoré","BRK","PG",55,64,52,30,52,58,73,30,69,68,34],["Isaiah Hartenstein","OKC","C",22,52,52,86,69,64,55,42,41,60,86],["Matisse Thybulle","LAL","SG",99,67,53,41,57,79,67,36,51,42,38],["Alex Caruso","OKC","SG",90,50,61,50,58,74,73,27,58,50,41],["Donovan Clingan","POR","C",6,69,56,92,76,51,53,69,39,50,99],["Gui Santos","GSW","PF",52,67,59,69,55,61,61,27,46,49,49],["Moussa Diabaté","CHO","C",49,52,52,89,66,58,60,48,37,48,81],["De'Anthony Melton","GSW","PG",86,54,61,40,62,83,87,30,68,60,44],["Brice Sensabaugh","UTA","SF",56,81,67,54,51,54,72,24,54,48,43],["Landry Shamet","NYK","SG",57,84,56,45,48,51,80,24,57,46,34],["Jeremiah Fears","NOP","PG",54,61,62,38,59,70,83,30,70,66,47],["Josh Hart","NYK","SG",52,88,59,52,64,67,79,27,66,71,72],["Kasparas Jakučionis","MIL","SG",45,87,61,37,48,51,72,21,59,54,40],["Kelly Oubre Jr.","IND","SF",36,74,60,55,64,77,68,33,53,46,56],["Zaccharie Risacher","DAL","SF",51,75,52,52,57,61,79,33,51,42,48],["Marcus Sasser","DAL","PG",39,72,45,29,44,46,65,28,56,50,33],["Jaylon Tyson","CLE","SG",72,99,58,50,56,58,79,30,60,52,57],["Ivica Zubac","IND","C",97,52,57,85,65,45,54,42,40,50,94],["Anfernee Simons","PHI","SG",21,87,71,42,48,48,82,21,61,53,39],["Cam Spencer","MEM","SG",80,99,74,42,51,54,70,24,67,77,39],["Luguentz Dort","ATL","SF",52,74,54,46,56,61,76,30,51,43,46],["Kris Dunn","LAC","PG",31,81,60,42,60,83,72,24,68,67,44],["Jaxson Hayes","UTA","C",6,52,57,87,55,45,63,42,35,41,50],["Graham Ike","GSW","C",37,52,51,59,51,57,63,30,37,44,46],["Isaiah Jackson","LAC","C",98,52,51,81,60,54,54,45,34,41,58],["Ausar Thompson","DET","SF",6,52,39,59,73,96,77,45,55,57,61],["Bogdan Bogdanović","HOU","SG",5,61,50,38,46,44,63,28,53,48,40],["Sidy Cissoko","POR","SF",2,57,48,51,50,54,68,27,50,45,37],["Jordan Goodwin","PHO","PG",16,80,52,40,60,80,82,24,66,56,55],["A.J. Green","MIL","SG",8,98,62,37,49,48,76,21,59,49,40],["Oso Ighodaro","PHO","PF",38,52,33,73,61,61,61,39,45,49,57],["Corey Kispert","ATL","SF",76,77,62,56,47,42,72,24,52,46,38],["Neemias Queta","BOS","C",14,52,58,87,70,58,65,57,37,47,79],["Jalen Suggs","ORL","PG",69,68,69,42,68,90,88,39,75,81,49],["Brayden Burries","MIL","SG",71,68,56,54,48,51,77,20,57,46,48],["Egor Dëmin","BRK","PG",51,85,53,31,54,58,73,27,69,65,44],["Klay Thompson","MIA","SF",69,84,50,38,49,48,58,27,52,44,36],["Khaman Maluach","PHO","C",9,48,50,59,47,38,50,40,36,38,42],["Josh Giddey","CHI","PG",87,78,60,44,68,64,81,33,84,99,78],["Jock Landale","ATL","C",77,83,49,79,54,48,52,33,37,47,61],["Scotty Pippen Jr.","MEM","PG",80,50,47,42,48,57,55,38,51,52,40],["Day'Ron Sharpe","BRK","C",22,45,55,86,60,67,55,30,38,51,68],["Marcus Smart","HOU","PG",40,70,60,38,59,77,83,30,68,62,41],["Isaiah Collier","UTA","PG",81,56,58,43,56,67,75,27,78,94,39],["Justin Champagnie","WAS","SF",58,66,64,63,60,61,72,36,51,43,60],["Gradey Dick","LAC","SG",91,52,61,43,47,51,82,21,55,40,35],["Isaiah Joe","DET","SG",46,96,71,47,51,54,82,24,58,45,39],["Chaney Johnson","BRK","SF",11,52,52,55,49,51,57,38,47,46,48],["Bennedict Mathurin","NOP","SF",90,60,72,56,57,58,69,24,56,52,59],["Sam Merrill","CLE","SG",6,95,68,48,49,51,74,21,61,53,40],["Kentavious Caldwell-Pope","PHI","SG",60,64,64,40,52,58,66,24,60,55,39],["Kingston Flemings","ATL","PG",18,72,54,43,50,45,80,30,70,72,45],["Javonte Green","DET","SG",98,76,66,46,56,70,71,27,55,40,41],["Morez Johnson Jr.","DAL","PF",30,52,61,71,45,38,62,20,44,42,46],["Tim Hardaway Jr.","MIA","SG",99,93,64,44,49,48,76,21,59,46,40],["Scoot Henderson","POR","PG",90,74,64,38,54,61,75,27,71,68,40],["Keegan Murray","SAC","PF",18,50,61,61,72,64,71,66,47,45,61],["Quinten Post","MEM","C",82,70,64,71,53,45,61,33,36,44,49],["Kobe Sanders","LAC","SG",64,89,59,42,49,54,70,21,57,47,38],["Isaiah Stewart","MEM","C",91,66,61,79,64,42,52,66,36,42,56],["Oscar Tshiebwe","HOU","C",48,48,46,69,50,48,50,30,38,43,58],["Joan Beringer","MIN","PF",92,47,51,55,45,40,52,41,41,39,40],["Mario Hezonja","CLE","PF",31,68,53,57,53,58,58,27,44,43,46],["Collin Murray-Boyles","TOR","PF",25,52,50,74,61,61,63,45,45,46,56],["Collin Gillespie","PHO","PG",59,92,67,36,57,70,78,24,73,74,50],["Daniel Gafford","DAL","C",20,52,57,85,68,58,61,57,36,42,69],["Rudy Gobert","MIN","C",99,52,40,97,78,58,47,66,38,47,99],["Myles Turner","MIL","C",66,86,54,67,70,54,54,66,37,45,58],["Andre Drummond","NYK","C",22,71,44,75,63,51,53,42,35,44,79],["Miles McBride","NYK","PG",39,91,57,32,52,61,75,24,68,60,38],["Noah Clowney","BRK","PF",38,70,61,60,59,58,61,39,46,44,50],["Josh Minott","BRK","SF",26,89,65,59,56,61,73,33,50,41,44],["Cason Wallace","OKC","SG",69,72,57,42,64,93,82,30,60,54,43],["Deandre Ayton","WAS","C",31,52,55,86,65,51,63,48,36,40,76],["Bub Carrington","WAS","PG",1,97,49,32,52,51,83,24,72,74,45],["Georges Niang","GSW","PF",58,56,61,68,51,64,66,20,43,41,41],["Jamison Battle","TOR","SF",71,74,50,52,41,37,59,24,46,38,35],["Mike Conley","BOS","PG",72,64,52,21,49,51,66,27,66,62,34],["LJ Cryer","GSW","PG",36,60,47,37,42,41,59,32,51,44,38],["Zach Edey","MEM","C",97,46,52,62,57,46,50,55,40,42,64],["Keon Ellis","BRK","SG",5,78,54,47,58,70,82,36,56,42,35],["DeAndre Jordan","NOP","C",22,45,46,53,47,42,43,42,40,42,48],["Jordan Poole","NOP","SG",83,70,64,37,51,51,75,30,63,58,36],["Jase Richardson","ORL","SG",64,62,49,44,43,44,66,22,53,43,32],["Jamal Shead","TOR","PG",69,57,52,29,51,61,85,24,72,80,34],["Hannes Steinbach","CHO","PF",44,50,51,54,49,46,53,44,48,46,51],["Jordan Walsh","BOS","PF",54,79,59,67,55,54,72,33,42,38,49],["Danny Wolf","BRK","PF",58,65,57,56,57,48,66,36,46,48,55],["Jay Huff","IND","C",12,68,73,80,68,48,64,75,37,45,49],["Aday Mara","OKC","C",98,52,55,71,59,38,64,60,34,42,51],["Gary Payton II","GSW","SG",35,55,67,61,54,61,66,27,57,48,46],["Jarace Walker","IND","PF",25,84,54,54,58,58,61,27,48,51,57],["Marvin Bagley III","DEN","PF",34,52,54,77,57,48,68,39,45,42,63],["Jordan Clarkson","NYK","SG",67,66,64,45,45,45,69,21,57,45,34],["Mitchell Robinson","BOS","C",32,52,36,97,68,61,64,54,34,41,82],["Buddy Hield","CHI","SG",30,75,64,48,51,58,69,24,57,46,38],["Kevin Huerter","DET","SG",33,53,65,50,58,61,76,33,60,54,46],["Nate Ament","MIL","SF",42,65,40,37,52,53,65,33,48,38,46],["Goga Bitadze","ORL","C",60,49,62,85,60,51,60,48,35,44,56],["Sergio de Larrea","DAL","PG",92,69,51,36,43,36,71,25,60,50,39],["Allen Graves","TOR","PF",41,65,60,81,60,58,66,57,42,40,46],["Tidjane Salaün","CHO","PF",99,82,49,58,49,44,57,27,42,38,48],["Emanuel Sharp","SAC","SG",71,76,43,20,45,42,79,27,55,41,25],["Jose Alvarado","NYK","PG",55,75,53,38,53,64,77,21,68,66,39],["Mikal Bridges","NYK","SF",22,81,68,55,64,74,69,42,58,62,48],["Yang Hansen","POR","C",46,38,47,48,43,39,49,34,38,40,38],["Quenton Jackson","IND","PG",0,76,64,41,48,51,79,21,68,62,38],["Cameron Johnson","DEN","PF",9,96,63,60,55,54,64,30,48,50,48],["Karlo Matković","NOP","PF",73,80,62,74,56,45,61,45,42,38,47],["Zeke Nnaji","DEN","PF",50,51,61,59,49,42,63,34,41,37,40],["Will Richard","GSW","SG",94,63,70,57,53,70,83,21,56,45,39],["GG Jackson II","MEM","PF",89,70,60,66,59,51,60,42,46,43,51],["Isaac Okoro","CHI","SG",81,70,61,51,53,54,78,33,58,47,40],["Ryan Dunn","PHO","SF",63,66,37,55,56,61,75,30,50,45,51],["Dean Wade","PHI","PF",98,75,63,65,56,54,65,30,43,43,51],["Ryan Kalkbrenner","CHO","C",62,52,63,92,64,48,64,63,34,40,59],["Trey Lyles","MIN","PF",6,74,61,76,49,45,57,24,42,41,45],["Royce O'Neale","CHO","SF",16,92,46,46,61,67,67,30,54,54,55],["Colin Castleton","ORL","C",54,42,42,42,42,42,42,41,42,42,42],["Walter Clayton","DAL","PG",35,58,65,34,50,51,81,27,70,70,36],["Luka Garza","BOS","C",95,92,63,83,50,45,56,30,35,42,50],["Al Horford","GSW","C",87,72,59,65,64,54,48,51,39,54,55],["Trayce Jackson-Davis","TOR","C",1,49,38,62,47,42,50,36,35,40,41],["Ryan Nembhard","DEN","PG",50,70,53,30,46,45,72,20,72,80,37],["Bones Hyland","MIN","PG",55,82,58,41,49,51,80,24,67,60,34],["Jake LaRavia","LAL","PF",4,66,57,66,60,74,71,33,45,46,49],["Steven Adams","HOU","C",1,52,42,83,59,54,53,36,35,45,80],["Alpha Diallo","DEN","SF",81,56,60,64,50,55,58,38,51,52,45],["Jordan Hawkins","CHI","SG",0,69,57,30,46,42,71,24,54,41,34],["Micah Potter","POR","C",86,90,71,76,54,48,60,27,37,45,56],["Dru Smith","MIA","SG",74,51,57,42,57,77,74,27,59,54,39],["Cam Whitmore","DEN","SF",50,51,49,47,47,48,56,36,46,41,42],["Bryce Hopkins","DEN","SF",28,52,64,64,41,32,69,20,47,38,36],["Baylor Scheierman","BOS","SG",31,88,69,48,50,48,72,21,56,46,46],["Kenrich Williams","OKC","PF",77,80,50,60,49,51,59,21,43,42,44],["Tyler Kolek","NYK","PG",53,79,48,32,45,45,84,21,65,60,33],["Svi Mykhailiuk","UTA","SF",62,93,64,56,47,48,66,21,52,48,39],["Jamal Cain","ORL","SF",27,66,56,50,44,42,61,27,46,40,38],["Clint Capela","HOU","C",91,52,42,70,56,48,60,42,33,39,53],["Herbert Jones","NOP","SF",59,55,58,45,63,83,79,33,54,55,45],["Nikola Jović","MIA","PF",47,50,49,54,53,51,71,30,45,48,44],["Jalen Pickett","LAC","SG",72,82,51,36,46,42,75,21,58,52,38],["Nick Richards","MIA","C",65,52,48,70,54,38,56,39,33,36,57],["Bennett Stirtz","OKC","PG",61,65,53,35,40,38,72,20,61,46,25],["Charles Bassey","GSW","C",45,44,46,50,45,42,47,42,40,41,44],["Hugo González","BOS","SG",4,75,45,47,52,51,71,27,53,39,44],["Draymond Green","GSW","PF",94,66,58,62,62,61,59,36,53,73,59],["Duop Reath","PHO","C",46,56,47,49,43,41,48,36,38,40,38],["Sion James","CHO","SG",50,69,55,33,52,51,76,24,57,50,46],["Tobe Awaka","CHI","PF",50,51,56,70,51,42,58,49,46,45,57],["Jevon Carter","ORL","PG",99,77,53,33,50,58,78,24,64,52,34],["Chris Cenac Jr.","BOS","PF",38,52,50,50,49,48,51,47,49,48,48],["Ousmane Dieng","MIL","C",8,70,53,59,50,45,59,27,38,52,44],["Ron Harper Jr.","BOS","SF",48,56,50,47,44,42,56,35,45,41,38],["Khris Middleton","WAS","SF",84,76,63,45,52,54,69,21,55,55,47],["Jonathan Mogbo","SAC","PF",55,46,44,49,43,42,50,36,41,40,39],["Malik Monk","SAC","SG",77,87,67,38,51,51,76,30,62,58,35],["Ben Sheppard","IND","SG",98,75,56,44,49,51,77,21,57,48,42],["Pat Spencer","PHO","PG",85,73,54,35,49,54,72,21,68,66,38],["Gary Trent Jr.","MIL","SG",3,76,52,34,44,48,80,20,56,44,29],["Ron Holland","DET","SF",91,38,60,53,58,70,77,27,51,43,49],["Jakob Poeltl","TOR","C",85,52,55,88,63,61,61,39,38,49,70],["Jaylin Williams","OKC","PF",30,83,58,57,60,48,60,36,46,50,59],["Nique Clifford","SAC","SG",37,61,48,40,55,61,81,27,59,53,48],["Josh Green","UTA","SG",36,87,58,47,47,51,82,21,54,41,34],["Baba Miller","LAC","SF",34,51,58,59,52,46,57,45,49,45,49],["Jabari Walker","PHI","SF",31,66,53,53,48,45,68,24,48,38,42],["Larry Nance Jr.","IND","PF",59,58,45,50,47,48,53,30,42,40,41],["Jamaree Bouyea","PHO","PG",74,56,48,39,49,50,74,28,62,53,35],["Moussa Cissé","DAL","C",85,50,37,68,57,47,53,51,34,37,56],["Ja'Kobi Gillespie","SAS","PG",69,51,52,51,49,49,52,48,51,49,48],["Jaden Hardy","LAL","SG",72,85,54,37,44,42,71,21,56,42,32],["Jett Howard","DAL","SF",17,79,65,44,44,38,66,24,49,40,33],["Alijah Martin","TOR","SG",78,44,44,40,42,42,49,38,44,41,39],["Labaron Philon Jr.","PHI","PG",39,55,50,45,47,45,57,41,53,48,44],["Daeqwon Plowden","SAC","SG",17,67,69,53,51,54,75,24,58,45,42],["Nikola Vučević","ORL","C",61,82,65,73,63,51,48,36,43,59,79],["Luke Kornet","SAS","C",88,52,67,83,60,48,54,48,36,48,63],["Tyus Jones","DEN","PG",60,56,52,29,46,51,77,20,64,58,29],["Tyrese Proctor","CLE","PG",28,64,57,36,44,47,68,23,58,49,33],["Jalen Slawson","IND","SF",8,57,47,44,55,59,57,46,47,48,46],["Tony Bradley","UTA","C",51,48,52,59,43,38,49,30,36,39,41],["Noa Essengue","CHI","PF",49,42,42,42,42,42,42,42,42,42,42],["Myron Gardner","MIA","SF",60,66,47,48,45,44,63,31,46,42,41],["Bronny James","LAL","SG",67,57,43,36,43,45,61,31,49,43,33],["David Jones García","SAS","SF",40,43,43,42,42,43,45,40,43,42,41],["Chaz Lanier","DET","SG",68,48,42,38,42,41,52,33,46,41,36],["Kevon Looney","LAL","C",18,46,45,53,47,43,50,38,39,44,50],["Chris Mañon","LAL","SG",7,43,43,43,42,43,44,41,43,42,41],["Bogoljub Markovic","MIL","PF",95,50,52,54,49,48,52,47,49,48,48],["Liam McNeeley","CHO","SF",44,63,45,40,44,40,56,31,45,41,40],["Koa Peat","PHO","PF",21,50,50,50,48,47,53,45,48,47,46],["Taurean Prince","DET","SF",56,86,55,42,51,50,63,26,51,47,43],["Zyon Pullin","MIN","SG",93,43,44,43,42,42,44,41,43,42,41],["Tarris Reed Jr.","SAS","C",53,50,53,57,48,46,51,43,46,47,48],["Ben Saraf","BRK","SG",1,37,60,39,52,61,74,24,61,60,36],["Dailyn Swain","CHI","SG",50,50,50,47,52,59,55,44,51,50,47],["Adem Bona","PHI","C",83,52,52,76,59,45,57,54,33,38,51],["Jaylen Clark","MIN","SG",67,66,42,43,48,54,80,21,54,40,34],["Josh Okogie","UTA","SG",43,78,37,40,50,58,82,24,55,42,40],["Ryan Conwell","MIA","SG",29,50,50,48,48,47,53,45,51,48,46],["Vít Krejčí","POR","PG",63,89,61,46,51,54,80,27,64,51,38],["Tobi Lawal","DAL","PF",14,50,50,50,49,49,52,46,49,48,46],["Carter Bryant","SAS","PF",77,60,48,54,47,38,60,27,41,37,39],["Harrison Barnes","SAS","PF",44,86,64,62,50,51,65,24,46,46,41],["Jaden Bradley","TOR","PG",7,51,49,42,48,49,58,42,52,48,44],["Isaiah Crawford","HOU","SF",82,43,44,44,42,41,45,40,43,41,40],["Zuby Ejiofor","ATL","PF",56,50,50,50,48,47,52,45,48,47,46],["Dorian Finney-Smith","ATL","PF",79,48,55,56,47,44,57,26,41,40,39],["DaRon Holmes","DEN","PF",63,54,47,50,42,39,50,37,42,40,39],["Asa Newell","ATL","PF",77,70,50,61,46,44,60,31,41,38,38],["Craig Porter Jr.","CLE","PG",58,66,48,40,57,61,86,36,67,64,45],["Jaylin Sellers","CHI","PG",77,57,50,42,45,42,64,36,55,51,39],["Christian Anderson Jr.","CHO","PG",14,56,46,30,48,51,71,27,60,49,34],["Zach Collins","CHI","PF",98,51,47,50,45,41,49,39,43,42,47],["Will Riley","WAS","SF",28,67,60,51,50,54,78,21,53,49,42],["Bruce Thornton","HOU","PG",20,50,55,54,48,48,54,44,52,48,45],["Leaky Black","SAC","SF",52,61,50,42,55,60,65,36,47,44,51],["Cam Christie","LAC","SG",43,47,48,37,43,42,69,28,50,40,35],["Josh Dix","OKC","SG",11,55,44,31,46,48,66,25,51,38,36],["Kyle Filipowski","UTA","C",24,66,60,76,63,61,64,33,40,54,71],["Nick Martinelli","LAC","SF",3,50,49,48,49,48,53,46,50,49,48],["Alex Morales","ORL","PG",44,42,42,42,42,42,43,41,43,42,42],["Ebuka Okorie","DET","PG",38,50,50,49,49,48,52,47,51,50,48],["Felix Okpara","WAS","C",72,50,50,50,50,50,50,49,50,50,50],["Brooks Barnhizer","OKC","SG",54,47,44,38,43,42,58,32,47,41,39],["Tolu Smith","DET","PF",47,44,43,46,43,41,47,40,42,41,42],["Malevy Leons","GSW","SF",76,46,46,45,45,46,52,37,44,42,40],["Rasheer Fleming","PHO","PF",55,65,40,55,48,45,60,30,40,35,38],["Alex Karaban","SAC","SF",61,51,50,50,47,45,54,41,49,47,44],["Jaden Akins","NYK","SG",38,50,50,50,50,49,51,49,50,50,49],["Kyle Anderson","TOR","SF",60,52,51,53,58,64,64,36,54,56,46],["Reece Beekman","WAS","PG",17,50,50,50,50,50,50,49,50,50,50],["Kobe Brown","IND","PF",2,81,60,62,48,45,69,24,43,42,42],["Maliq Brown","SAS","PF",17,50,50,50,50,50,50,49,50,50,50],["Pacôme Dadiet","NYK","SG",64,43,44,42,42,41,49,37,44,41,39],["Mohamed Diawara","NYK","SF",9,71,59,44,43,39,67,23,47,40,32],["Justin Edwards","PHI","SF",4,73,59,48,50,58,77,24,50,44,32],["Isaiah Evans","MIN","SG",7,50,50,48,48,48,53,46,50,49,46],["Simone Fontecchio","MIA","SF",49,84,58,48,48,48,70,21,51,44,42],["Anthony Gill","WAS","PF",89,52,63,73,51,51,54,30,43,42,42],["PJ Hall","CHO","C",36,45,46,50,44,41,47,39,39,41,44],["Elijah Harkless","DET","SG",6,44,50,39,52,64,68,28,56,54,37],["Taylor Hendricks","MEM","PF",15,73,52,64,56,58,70,33,43,39,47],["Joshua Jefferson","BRK","PF",81,51,50,50,49,49,51,48,49,49,48],["Isaac Jones","DET","PF",84,43,43,43,42,41,43,41,42,42,41],["Jayson Kent","POR","SF",30,42,43,43,42,42,43,41,42,42,42],["Caleb Love","PHI","SG",15,59,52,39,48,51,76,21,60,54,38],["Tre Mann","WAS","PG",96,58,49,27,46,48,75,22,62,52,34],["Bryce McGowens","NOP","SG",57,83,58,43,49,51,82,24,57,46,36],["Jordan McLaughlin","SAS","PG",59,46,42,36,43,44,57,32,50,44,36],["Kris Murray","MEM","SF",45,53,56,61,54,61,79,30,50,44,46],["Micah Peavy","OKC","SG",23,52,53,38,48,54,73,21,55,42,35],["Drake Powell","BRK","SG",55,48,67,42,48,51,74,24,56,46,34],["Jericho Sims","MIL","C",54,52,58,91,51,42,54,27,35,46,59],["Braden Smith","IND","PG",26,50,50,48,49,48,52,47,51,49,48],["Jae'Sean Tate","HOU","SF",1,48,53,49,42,40,60,30,45,40,37],["Jarred Vanderbilt","LAL","PF",36,50,44,65,55,58,69,27,42,42,53],["Cody Williams","MIN","SG",16,31,55,48,54,58,78,30,58,50,42],["James Wiseman","NYK","C",28,43,43,44,42,41,43,41,41,42,41],["Kon Knueppel","CHO","SF",30,99,73,56,55,54,71,24,59,60,58],["Santi Aldama","MEM","PF",68,70,53,68,64,61,70,39,49,54,68],["Mouhamed Gueye","ATL","PF",5,54,47,63,55,58,60,33,42,39,46],["Henri Veesaar","ATL","C",68,50,50,50,50,50,50,50,50,50,50],["Devin Carter","BOS","PG",30,49,53,41,53,61,79,24,67,60,44],["Kylan Boswell","CHO","PG",97,50,50,50,50,50,50,50,50,50,50],["Coby White","CHO","SG",41,76,67,47,50,48,72,21,66,65,45],["Grant Williams","CHO","PF",15,79,58,61,53,48,68,33,44,44,49],["Nic Claxton","CHI","C",27,39,45,80,65,54,63,51,42,62,69],["Patrick Williams","CHI","PF",88,70,52,48,53,54,66,30,44,43,42],["Nae'Qwan Tomlin","CLE","PF",14,39,55,67,52,51,65,33,42,38,42],["Tarik Biberovic","DAL","SF",95,50,50,50,50,50,50,50,50,50,50],["Dereck Lively II","DAL","C",36,44,45,48,46,44,44,46,41,43,45],["Spencer Jones","DEN","SF",38,81,52,60,55,58,73,33,49,40,44],["Julian Strawther","DEN","SG",27,79,61,42,47,45,78,21,56,43,36],["Jimmy Butler","GSW","SF",9,73,74,69,60,77,62,24,63,71,60],["Moses Moody","GSW","SG",10,89,61,45,58,64,73,36,59,47,44],["Kristaps Porziņģis","GSW","C",96,71,70,72,64,51,55,54,41,53,57],["Johnny Furphy","IND","SG",84,68,45,50,52,50,69,25,54,44,51],["T.J. McConnell","IND","PG",54,52,60,40,53,64,72,24,73,78,37],["Bradley Beal","LAC","SG",81,47,43,40,42,43,48,38,45,43,39],["Brandon Ingram","LAC","SF",35,86,70,54,63,58,66,39,61,62,60],["Yanic Konan Niederhäuser","LAC","C",87,48,52,62,47,38,48,40,36,39,42],["Jordan Miller","LAC","SF",81,66,64,59,52,58,67,24,54,51,42],["Max Strus","LAC","SF",19,60,49,47,46,42,52,32,47,45,49],["Cameron Carr","LAL","SG",6,50,50,50,50,50,50,50,50,50,50],["Adou Thiero","LAL","SF",42,44,44,43,42,42,49,38,43,41,39],["Donte DiVincenzo","MIN","SG",37,84,58,42,61,74,78,30,64,64,50],["Thomas Sorber","OKC","C",53,50,50,50,50,50,50,50,50,50,50],["Nikola Topić","OKC","PG",6,49,43,40,43,43,50,37,48,49,40],["Jonathan Isaac","ORL","PF",62,42,45,55,49,44,56,38,40,37,40],["Izaiyah Nelson","ORL","C",23,50,50,50,50,50,50,50,50,50,50],["Noah Penda","ORL","SF",17,60,51,47,50,48,70,27,49,43,44],["Dominick Barlow","PHI","PF",30,48,57,71,59,61,70,39,43,41,55],["Tacko Fall","PHI","C",16,50,50,50,50,50,50,50,50,50,50],["Ariel Hukporti","PHI","C",89,49,54,61,47,39,54,36,35,39,42],["Mark Williams","PHO","C",99,52,67,87,66,61,57,45,36,42,76],["Shaedon Sharpe","POR","SG",43,72,66,48,59,77,79,21,64,54,51],["Dylan Cardwell","SAC","C",61,52,42,81,69,54,54,63,35,44,73],["Maxime Raynaud","SAC","C",3,52,65,77,60,48,58,33,37,44,73],["Ben Simmons","SAC","PG",21,50,50,50,50,50,50,50,50,50,50],["Tobias Harris","SAS","PF",26,78,70,60,60,61,62,30,48,51,57],["Jayden Quaintance","SAS","PF",82,50,50,50,50,50,50,50,50,50,50],["Nate Bittle","TOR","C",57,50,50,50,50,50,50,50,50,50,50],["Jusuf Nurkić","UTA","C",66,70,39,76,72,74,58,33,44,70,93],["Tristan Vukcevic","WAS","C",79,69,61,69,54,48,58,39,36,42,42],["Jamir Watkins","WAS","SG",95,51,55,53,59,67,82,33,56,45,49],["Wilt Chamberlain (1959-60)","GSW","C",13,25,56,99,85,59,61,60,45,53,99,{"leg":1,"team":"Warriors (Filadelfia)","yr":"1959-60"}],["Bob Pettit (1959-60)","ATL","PF",9,50,71,81,70,64,72,38,55,61,93,{"leg":1,"team":"Hawks (San Luis)","yr":"1959-60"}],["Elgin Baylor (1959-60)","LAL","SF",22,47,69,67,66,63,70,21,63,63,91,{"leg":1,"team":"Lakers (Minneapolis)","yr":"1959-60"}],["Jack Twyman (1959-60)","SAC","SF",22,56,76,62,57,63,74,21,63,63,59,{"leg":1,"team":"Royals (Cincinnati)","yr":"1959-60"}],["Bill Russell (1959-60)","BOS","C",6,26,53,91,81,64,66,53,45,64,99,{"leg":1,"team":"Celtics","yr":"1959-60"}],["Bob Cousy (1959-60)","BOS","PG",14,57,69,41,61,91,73,21,87,99,42,{"leg":1,"team":"Celtics","yr":"1959-60"}],["Richie Guerin (1959-60)","NYK","SG",78,53,70,52,60,80,82,21,73,86,50,{"leg":1,"team":"Knicks","yr":"1959-60"}],["Dolph Schayes (1959-60)","PHI","PF",41,74,83,72,62,63,70,28,53,60,76,{"leg":1,"team":"Nationals","yr":"1959-60"}],["Cliff Hagan (1959-60)","ATL","SF",63,59,77,63,60,65,72,21,63,67,67,{"leg":1,"team":"Hawks (San Luis)","yr":"1959-60"}],["Gene Shue (1959-60)","DET","PG",47,70,81,46,56,71,84,21,75,72,45,{"leg":1,"team":"Pistons","yr":"1959-60"}],["Oscar Robertson (1964-65)","SAC","PG",1,68,87,55,68,99,87,21,98,99,60,{"leg":1,"team":"Royals (Cincinnati)","yr":"1964-65"}],["Wilt Chamberlain (1964-65)","PHI","C",13,25,46,99,80,64,61,51,49,64,99,{"leg":1,"team":"76ers","yr":"1964-65"}],["Jerry West (1964-65)","LAL","PG",44,65,86,55,58,76,81,21,81,83,47,{"leg":1,"team":"Lakers","yr":"1964-65"}],["Bill Russell (1964-65)","BOS","C",6,25,47,88,84,71,65,54,48,81,99,{"leg":1,"team":"Celtics","yr":"1964-65"}],["Elgin Baylor (1964-65)","LAL","SF",22,60,75,59,63,66,68,21,64,68,76,{"leg":1,"team":"Lakers","yr":"1964-65"}],["Jerry Lucas (1964-65)","SAC","PF",3,64,79,83,74,60,67,45,51,53,99,{"leg":1,"team":"Royals (Cincinnati)","yr":"1964-65"}],["Sam Jones (1964-65)","BOS","SG",37,65,80,51,55,68,73,21,67,60,44,{"leg":1,"team":"Celtics","yr":"1964-65"}],["Walt Bellamy (1964-65)","WAS","C",33,42,67,89,65,60,62,33,45,55,84,{"leg":1,"team":"Bullets (Baltimore)","yr":"1964-65"}],["Bob Pettit (1964-65)","ATL","PF",9,65,77,73,61,61,68,28,52,55,75,{"leg":1,"team":"Hawks (San Luis)","yr":"1964-65"}],["Gus Johnson (1964-65)","WAS","SF",88,41,59,58,63,65,67,21,61,66,77,{"leg":1,"team":"Bullets (Baltimore)","yr":"1964-65"}],["Jerry West (1969-70)","LAL","PG",44,61,80,52,58,81,79,21,83,94,44,{"leg":1,"team":"Lakers","yr":"1969-70"}],["Kareem Abdul-Jabbar (1969-70)","MIL","C",33,32,59,88,69,64,61,36,48,63,91,{"leg":1,"team":"Bucks","yr":"1969-70"}],["Willis Reed (1969-70)","NYK","C",19,49,68,83,66,57,57,35,41,48,88,{"leg":1,"team":"Knicks","yr":"1969-70"}],["Billy Cunningham (1969-70)","PHI","SF",59,44,65,64,65,64,74,21,62,65,86,{"leg":1,"team":"76ers","yr":"1969-70"}],["Connie Hawkins (1969-70)","PHO","SF",78,53,71,64,61,66,69,21,63,68,71,{"leg":1,"team":"Suns","yr":"1969-70"}],["Walt Frazier (1969-70)","NYK","PG",10,48,67,51,61,83,77,21,82,99,50,{"leg":1,"team":"Knicks","yr":"1969-70"}],["Oscar Robertson (1969-70)","SAC","PG",1,58,76,51,61,82,83,21,83,98,51,{"leg":1,"team":"Royals (Cincinnati)","yr":"1969-70"}],["John Havlicek (1969-70)","BOS","SG",17,64,77,52,62,78,81,21,73,84,59,{"leg":1,"team":"Celtics","yr":"1969-70"}],["Elvin Hayes (1969-70)","HOU","C",97,37,60,84,71,57,60,42,43,48,99,{"leg":1,"team":"Rockets (San Diego)","yr":"1969-70"}],["Nate Thurmond (1969-70)","GSW","C",42,49,63,82,74,62,59,44,44,59,99,{"leg":1,"team":"Warriors (San Francisco)","yr":"1969-70"}],["Bob McAdoo (1974-75)","LAC","C",11,56,82,89,86,61,63,78,45,51,99,{"leg":1,"team":"Braves","yr":"1974-75"}],["Kareem Abdul-Jabbar (1974-75)","MIL","C",33,49,74,82,98,58,60,99,49,66,98,{"leg":1,"team":"Bucks","yr":"1974-75"}],["Rick Barry (1974-75)","GSW","SF",24,73,88,57,72,99,81,29,69,82,53,{"leg":1,"team":"Warriors","yr":"1974-75"}],["Elvin Hayes (1974-75)","WAS","PF",97,49,68,70,92,82,69,83,52,51,88,{"leg":1,"team":"Bullets","yr":"1974-75"}],["Dave Cowens (1974-75)","BOS","C",18,52,69,77,79,66,54,49,48,70,99,{"leg":1,"team":"Celtics","yr":"1974-75"}],["Tiny Archibald (1974-75)","SAC","PG",50,67,83,49,54,72,79,21,83,93,37,{"leg":1,"team":"KCO","yr":"1974-75"}],["Bob Lanier (1974-75)","DET","C",48,56,76,81,84,58,59,83,49,70,87,{"leg":1,"team":"Pistons","yr":"1974-75"}],["Walt Frazier (1974-75)","NYK","PG",10,60,76,48,67,95,77,24,80,87,55,{"leg":1,"team":"Knicks","yr":"1974-75"}],["Spencer Haywood (1974-75)","OKC","PF",17,57,73,70,71,53,70,63,51,48,73,{"leg":1,"team":"SuperSonics","yr":"1974-75"}],["Sidney Wicks (1974-75)","POR","PF",68,39,63,75,72,66,67,46,54,59,80,{"leg":1,"team":"Trail Blazers","yr":"1974-75"}],["Kareem Abdul-Jabbar (1979-80)","LAL","C",33,48,74,83,91,58,56,99,49,68,86,{"leg":1,"team":"Lakers","yr":"1979-80"}],["George Gervin (1979-80)","SAS","SG",44,88,85,59,63,68,75,42,67,54,53,{"leg":1,"team":"Spurs","yr":"1979-80"}],["Julius Erving (1979-80)","PHI","SF",6,52,74,66,78,89,71,62,65,68,66,{"leg":1,"team":"76ers","yr":"1979-80"}],["Moses Malone (1979-80)","HOU","C",2,46,64,95,72,58,63,49,43,47,99,{"leg":1,"team":"Rockets","yr":"1979-80"}],["Larry Bird (1979-80)","BOS","PF",33,92,74,67,72,76,72,33,55,66,84,{"leg":1,"team":"Celtics","yr":"1979-80"}],["World B. Free (1979-80)","LAC","SG",90,73,69,58,54,63,77,30,70,66,43,{"leg":1,"team":"Clippers (San Diego)","yr":"1979-80"}],["Adrian Dantley (1979-80)","UTA","SF",4,62,83,71,60,68,74,23,61,55,67,{"leg":1,"team":"Jazz","yr":"1979-80"}],["Dennis Johnson (1979-80)","OKC","SG",98,64,64,49,66,78,81,42,67,66,52,{"leg":1,"team":"SuperSonics","yr":"1979-80"}],["Michael Ray Richardson (1979-80)","NYK","SG",95,62,52,51,75,99,81,28,78,99,61,{"leg":1,"team":"Knicks","yr":"1979-80"}],["Gus Williams (1979-80)","OKC","PG",14,62,69,47,63,94,77,30,76,76,42,{"leg":1,"team":"SuperSonics","yr":"1979-80"}],["Larry Bird (1984-85)","BOS","SF",33,95,84,61,79,77,78,46,69,81,85,{"leg":1,"team":"Celtics","yr":"1984-85"}],["Magic Johnson (1984-85)","LAL","PG",32,66,77,52,63,74,76,25,91,99,59,{"leg":1,"team":"Lakers","yr":"1984-85"}],["Michael Jordan (1984-85)","CHI","SG",23,65,80,58,73,99,83,37,73,77,61,{"leg":1,"team":"Bulls","yr":"1984-85"}],["Bernard King (1984-85)","NYK","SF",1,51,74,66,59,69,73,25,63,61,57,{"leg":1,"team":"Knicks","yr":"1984-85"}],["Moses Malone (1984-85)","PHI","C",2,57,72,86,75,55,62,56,42,45,99,{"leg":1,"team":"76ers","yr":"1984-85"}],["Isiah Thomas (1984-85)","DET","PG",11,76,70,45,65,97,82,25,94,99,49,{"leg":1,"team":"Pistons","yr":"1984-85"}],["Terry Cummings (1984-85)","MIL","PF",71,44,64,70,69,74,70,37,52,53,77,{"leg":1,"team":"Bucks","yr":"1984-85"}],["Alex English (1984-85)","DEN","SF",2,56,77,62,59,66,65,32,63,64,56,{"leg":1,"team":"Nuggets","yr":"1984-85"}],["Ralph Sampson (1984-85)","HOU","PF",45,43,56,69,78,60,65,65,51,51,84,{"leg":1,"team":"Rockets","yr":"1984-85"}],["Kareem Abdul-Jabbar (1984-85)","LAL","C",33,43,67,80,73,55,51,67,44,57,69,{"leg":1,"team":"Lakers","yr":"1984-85"}],["Sidney Moncrief (1984-85)","MIL","PG",41,74,73,50,62,77,84,30,76,77,54,{"leg":1,"team":"Bucks","yr":"1984-85"}],["Michael Ray Richardson (1984-85)","BRK","PG",95,72,65,45,72,99,83,25,82,99,56,{"leg":1,"team":"Nets (Nueva Jersey)","yr":"1984-85"}],["Dominique Wilkins (1984-85)","ATL","SF",21,82,72,60,66,80,78,34,60,52,63,{"leg":1,"team":"Hawks","yr":"1984-85"}],["Purvis Short (1984-85)","GSW","SF",31,87,74,59,59,74,74,25,61,56,53,{"leg":1,"team":"Warriors","yr":"1984-85"}],["Hakeem Olajuwon (1984-85)","HOU","C",34,25,50,88,83,66,65,81,40,44,93,{"leg":1,"team":"Rockets","yr":"1984-85"}],["Michael Jordan (1989-90)","CHI","SG",23,92,86,60,76,99,84,35,75,82,64,{"leg":1,"team":"Bulls","yr":"1989-90"}],["Magic Johnson (1989-90)","LAL","PG",32,97,83,52,65,79,74,28,91,99,62,{"leg":1,"team":"Lakers","yr":"1989-90"}],["Karl Malone (1989-90)","UTA","PF",32,75,75,82,72,73,74,33,54,53,89,{"leg":1,"team":"Jazz","yr":"1989-90"}],["Patrick Ewing (1989-90)","NYK","C",33,50,75,84,96,59,65,99,45,50,88,{"leg":1,"team":"Knicks","yr":"1989-90"}],["Charles Barkley (1989-90)","PHI","SF",34,56,74,83,73,84,72,33,62,63,91,{"leg":1,"team":"76ers","yr":"1989-90"}],["Hakeem Olajuwon (1989-90)","HOU","C",34,46,63,81,99,90,67,99,45,56,99,{"leg":1,"team":"Rockets","yr":"1989-90"}],["Larry Bird (1989-90)","BOS","SF",33,91,86,55,73,70,73,38,70,90,79,{"leg":1,"team":"Celtics","yr":"1989-90"}],["David Robinson (1989-90)","SAS","C",50,43,66,88,99,79,60,99,43,49,94,{"leg":1,"team":"Spurs","yr":"1989-90"}],["John Stockton (1989-90)","UTA","PG",12,89,73,47,65,99,80,23,96,99,38,{"leg":1,"team":"Jazz","yr":"1989-90"}],["Kevin Johnson (1989-90)","PHO","PG",18,59,77,49,56,68,86,23,91,99,44,{"leg":1,"team":"Suns","yr":"1989-90"}],["Tom Chambers (1989-90)","PHO","PF",2,74,82,70,64,62,70,33,53,49,64,{"leg":1,"team":"Suns","yr":"1989-90"}],["Clyde Drexler (1989-90)","POR","SG",22,69,70,58,68,87,85,35,72,79,64,{"leg":1,"team":"Trail Blazers","yr":"1989-90"}],["Chris Mullin (1989-90)","GSW","SF",73,95,87,67,65,76,75,33,63,64,58,{"leg":1,"team":"Warriors","yr":"1989-90"}],["Dominique Wilkins (1989-90)","ATL","SF",21,79,75,64,64,76,75,33,60,53,61,{"leg":1,"team":"Hawks","yr":"1989-90"}],["Ron Harper (1989-90)","LAC","SG",30,67,69,55,74,95,86,48,70,74,58,{"leg":1,"team":"Clippers","yr":"1989-90"}],["David Robinson (1994-95)","SAS","C",50,52,78,86,95,81,60,96,47,57,89,{"leg":1,"team":"Spurs","yr":"1994-95"}],["Shaquille O'Neal (1994-95)","ORL","C",34,52,51,95,81,58,56,77,46,55,93,{"leg":1,"team":"Magic","yr":"1994-95"}],["Karl Malone (1994-95)","UTA","PF",32,52,74,75,78,78,71,42,56,60,88,{"leg":1,"team":"Jazz","yr":"1994-95"}],["Hakeem Olajuwon (1994-95)","HOU","C",34,52,74,80,99,84,63,99,48,62,89,{"leg":1,"team":"Rockets","yr":"1994-95"}],["Scottie Pippen (1994-95)","CHI","SF",33,93,67,63,84,99,71,45,65,75,73,{"leg":1,"team":"Bulls","yr":"1994-95"}],["Charles Barkley (1994-95)","PHO","PF",34,90,71,76,75,78,62,35,56,64,91,{"leg":1,"team":"Suns","yr":"1994-95"}],["Patrick Ewing (1994-95)","NYK","C",33,52,71,77,82,58,60,67,45,55,91,{"leg":1,"team":"Knicks","yr":"1994-95"}],["Anfernee Hardaway (1994-95)","ORL","PG",81,94,74,55,60,81,83,25,82,97,49,{"leg":1,"team":"Magic","yr":"1994-95"}],["John Stockton (1994-95)","UTA","PG",12,99,75,50,65,99,75,25,92,99,41,{"leg":1,"team":"Jazz","yr":"1994-95"}],["Gary Payton (1994-95)","OKC","PG",20,78,68,50,65,99,89,23,82,96,43,{"leg":1,"team":"SuperSonics","yr":"1994-95"}],["Clyde Drexler (1994-95)","HOU","SG",22,99,79,55,67,84,81,33,70,73,61,{"leg":1,"team":"Rockets","yr":"1994-95"}],["Chris Webber (1994-95)","WAS","PF",4,70,44,75,76,75,72,57,56,69,82,{"leg":1,"team":"Bullets","yr":"1994-95"}],["Mitch Richmond (1994-95)","SAC","SG",2,99,80,48,58,64,79,28,68,65,49,{"leg":1,"team":"Kings","yr":"1994-95"}],["Rod Strickland (1994-95)","POR","PG",48,98,66,46,63,87,77,20,85,99,53,{"leg":1,"team":"Trail Blazers","yr":"1994-95"}],["Shawn Kemp (1994-95)","OKC","PF",86,52,70,81,75,67,66,55,49,46,90,{"leg":1,"team":"SuperSonics","yr":"1994-95"}],["Shaquille O'Neal (1999-00)","LAL","C",34,25,50,99,87,47,55,94,49,66,99,{"leg":1,"team":"Lakers","yr":"1999-00"}],["Kevin Garnett (1999-00)","MIN","PF",21,94,72,74,83,77,68,58,59,74,95,{"leg":1,"team":"Timberwolves","yr":"1999-00"}],["Gary Payton (1999-00)","OKC","PG",20,92,69,50,67,89,84,23,89,99,62,{"leg":1,"team":"SuperSonics","yr":"1999-00"}],["Tim Duncan (1999-00)","SAS","PF",21,52,71,80,83,59,61,73,55,59,99,{"leg":1,"team":"Spurs","yr":"1999-00"}],["Alonzo Mourning (1999-00)","MIA","C",33,52,68,87,88,47,58,99,43,47,81,{"leg":1,"team":"Heat","yr":"1999-00"}],["Karl Malone (1999-00)","UTA","PF",32,52,78,77,70,62,65,41,57,63,81,{"leg":1,"team":"Jazz","yr":"1999-00"}],["Allen Iverson (1999-00)","PHI","SG",3,92,66,53,63,95,75,21,73,74,45,{"leg":1,"team":"76ers","yr":"1999-00"}],["Chris Webber (1999-00)","SAC","PF",4,70,71,73,83,80,73,61,59,71,87,{"leg":1,"team":"Kings","yr":"1999-00"}],["Grant Hill (1999-00)","DET","SF",33,89,77,64,66,74,68,33,68,78,63,{"leg":1,"team":"Pistons","yr":"1999-00"}],["Kobe Bryant (1999-00)","LAL","SG",8,83,77,56,69,80,81,41,72,76,61,{"leg":1,"team":"Lakers","yr":"1999-00"}],["Vince Carter (1999-00)","TOR","SF",15,99,75,62,67,71,73,46,65,67,58,{"leg":1,"team":"Raptors","yr":"1999-00"}],["Jason Kidd (1999-00)","PHO","PG",5,90,70,43,71,92,85,28,88,99,66,{"leg":1,"team":"Suns","yr":"1999-00"}],["Michael Finley (1999-00)","DAL","SF",92,99,76,57,63,71,79,28,67,78,61,{"leg":1,"team":"Mavericks","yr":"1999-00"}],["Stephon Marbury (1999-00)","BRK","PG",87,72,75,48,57,77,77,23,87,99,42,{"leg":1,"team":"Nets (Nueva Jersey)","yr":"1999-00"}],["Jerry Stackhouse (1999-00)","DET","SG",8,73,77,57,57,71,74,28,71,73,45,{"leg":1,"team":"Pistons","yr":"1999-00"}],["Allen Iverson (2004-05)","PHI","PG",3,84,81,50,67,99,78,21,88,99,47,{"leg":1,"team":"76ers","yr":"2004-05"}],["LeBron James (2004-05)","CLE","SF",23,99,71,64,76,99,77,36,73,95,68,{"leg":1,"team":"Cavaliers","yr":"2004-05"}],["Dirk Nowitzki (2004-05)","DAL","PF",41,99,84,70,80,70,71,57,56,58,83,{"leg":1,"team":"Mavericks","yr":"2004-05"}],["Kevin Garnett (2004-05)","MIN","PF",21,52,76,77,86,79,68,54,61,80,99,{"leg":1,"team":"Timberwolves","yr":"2004-05"}],["Shaquille O'Neal (2004-05)","MIA","C",34,25,39,97,77,48,51,77,45,57,87,{"leg":1,"team":"Heat","yr":"2004-05"}],["Steve Nash (2004-05)","PHO","PG",13,99,80,47,53,63,78,21,93,99,43,{"leg":1,"team":"Suns","yr":"2004-05"}],["Dwyane Wade (2004-05)","MIA","SG",3,71,71,59,69,82,76,46,77,93,54,{"leg":1,"team":"Heat","yr":"2004-05"}],["Kobe Bryant (2004-05)","LAL","SG",8,94,78,58,66,73,80,39,76,86,59,{"leg":1,"team":"Lakers","yr":"2004-05"}],["Tracy McGrady (2004-05)","HOU","SF",1,90,72,58,70,86,80,36,69,82,61,{"leg":1,"team":"Rockets","yr":"2004-05"}],["Tim Duncan (2004-05)","SAS","PF",21,52,58,77,83,54,60,85,52,55,91,{"leg":1,"team":"Spurs","yr":"2004-05"}],["Amar'e Stoudemire (2004-05)","PHO","C",1,52,72,91,74,63,54,59,44,48,78,{"leg":1,"team":"Suns","yr":"2004-05"}],["Gilbert Arenas (2004-05)","WAS","PG",9,99,77,50,63,86,84,26,80,83,51,{"leg":1,"team":"Wizards","yr":"2004-05"}],["Vince Carter (2004-05)","BRK","SF",15,99,74,58,64,76,73,33,65,70,54,{"leg":1,"team":"Nets (Nueva Jersey)","yr":"2004-05"}],["Ray Allen (2004-05)","OKC","SG",46,99,83,50,56,67,77,21,69,66,49,{"leg":1,"team":"SuperSonics","yr":"2004-05"}],["Larry Hughes (2004-05)","WAS","SG",58,75,70,53,77,99,78,26,71,75,61,{"leg":1,"team":"Wizards","yr":"2004-05"}],["LeBron James (2009-10)","CLE","SF",23,87,77,69,75,86,76,45,77,99,69,{"leg":1,"team":"Cavaliers","yr":"2009-10"}],["Kobe Bryant (2009-10)","LAL","SG",8,86,77,54,64,82,78,26,74,79,57,{"leg":1,"team":"Lakers","yr":"2009-10"}],["Kevin Durant (2009-10)","OKC","SF",35,99,91,67,73,79,73,45,62,59,71,{"leg":1,"team":"Thunder","yr":"2009-10"}],["Dwyane Wade (2009-10)","MIA","SG",3,76,72,60,72,92,77,47,78,92,53,{"leg":1,"team":"Heat","yr":"2009-10"}],["Carmelo Anthony (2009-10)","DEN","SF",7,81,80,67,63,75,69,29,63,62,64,{"leg":1,"team":"Nuggets","yr":"2009-10"}],["Dwight Howard (2009-10)","ORL","C",12,52,52,99,92,62,64,93,42,50,99,{"leg":1,"team":"Magic","yr":"2009-10"}],["Deron Williams (2009-10)","UTA","PG",8,99,72,47,59,75,83,23,92,99,48,{"leg":1,"team":"Jazz","yr":"2009-10"}],["Dirk Nowitzki (2009-10)","DAL","PF",41,99,89,68,69,62,67,45,55,56,71,{"leg":1,"team":"Mavericks","yr":"2009-10"}],["Chris Bosh (2009-10)","TOR","C",0,52,75,87,69,52,55,45,45,55,91,{"leg":1,"team":"Raptors","yr":"2009-10"}],["Chris Paul (2009-10)","NOP","PG",3,99,76,45,68,99,89,23,93,99,49,{"leg":1,"team":"Hornets (Nueva Orleans)","yr":"2009-10"}],["Monta Ellis (2009-10)","GSW","SG",15,88,68,50,69,99,83,29,74,82,48,{"leg":1,"team":"Warriors","yr":"2009-10"}],["David Lee (2009-10)","NYK","C",19,52,76,83,71,65,65,31,47,66,97,{"leg":1,"team":"Knicks","yr":"2009-10"}],["Steve Nash (2009-10)","PHO","PG",13,99,84,45,50,49,72,21,93,99,43,{"leg":1,"team":"Suns","yr":"2009-10"}],["Amar'e Stoudemire (2009-10)","PHO","PF",1,52,74,82,65,52,60,45,49,41,79,{"leg":1,"team":"Suns","yr":"2009-10"}],["Joe Johnson (2009-10)","ATL","SG",7,99,74,49,57,69,74,21,72,78,51,{"leg":1,"team":"Hawks","yr":"2009-10"}],["James Harden (2014-15)","HOU","SG",13,94,86,59,72,93,78,38,79,96,59,{"leg":1,"team":"Rockets","yr":"2014-15"}],["LeBron James (2014-15)","CLE","SF",23,86,68,65,71,84,74,38,74,98,61,{"leg":1,"team":"Cavaliers","yr":"2014-15"}],["Russell Westbrook (2014-15)","OKC","PG",0,67,81,58,70,99,83,24,90,99,70,{"leg":1,"team":"Thunder","yr":"2014-15"}],["Stephen Curry (2014-15)","GSW","PG",30,99,90,49,66,96,89,24,87,99,50,{"leg":1,"team":"Warriors","yr":"2014-15"}],["Anthony Davis (2014-15)","NOP","PF",3,52,79,81,96,80,69,99,53,51,89,{"leg":1,"team":"Pelicans","yr":"2014-15"}],["Chris Paul (2014-15)","LAC","PG",3,99,85,48,66,93,87,24,92,99,52,{"leg":1,"team":"Clippers","yr":"2014-15"}],["DeMarcus Cousins (2014-15)","SAC","C",49,52,72,88,88,80,56,68,49,65,99,{"leg":1,"team":"Kings","yr":"2014-15"}],["LaMarcus Aldridge (2014-15)","POR","PF",48,80,79,73,70,55,63,47,52,47,89,{"leg":1,"team":"Trail Blazers","yr":"2014-15"}],["Blake Griffin (2014-15)","LAC","PF",47,52,66,74,63,61,66,33,60,78,72,{"leg":1,"team":"Clippers","yr":"2014-15"}],["Marc Gasol (2014-15)","MEM","C",7,52,72,76,75,61,63,65,47,67,73,{"leg":1,"team":"Grizzlies","yr":"2014-15"}],["John Wall (2014-15)","WAS","PG",3,67,69,45,68,87,76,36,90,99,52,{"leg":1,"team":"Wizards","yr":"2014-15"}],["Kobe Bryant (2014-15)","LAL","SG",8,66,70,47,62,74,72,24,74,84,59,{"leg":1,"team":"Lakers","yr":"2014-15"}],["Pau Gasol (2014-15)","CHI","PF",16,52,73,75,78,42,57,74,52,55,99,{"leg":1,"team":"Bulls","yr":"2014-15"}],["Carmelo Anthony (2014-15)","NYK","SF",7,81,73,63,61,64,66,30,62,61,65,{"leg":1,"team":"Knicks","yr":"2014-15"}],["Kyrie Irving (2014-15)","CLE","PG",31,99,81,47,60,80,76,27,80,85,43,{"leg":1,"team":"Cavaliers","yr":"2014-15"}],["Giannis Antetokounmpo (2019-20)","MIL","PF",34,56,59,89,79,65,62,47,61,76,99,{"leg":1,"team":"Bucks","yr":"2019-20"}],["James Harden (2019-20)","HOU","SG",13,77,86,65,74,91,75,44,78,94,63,{"leg":1,"team":"Rockets","yr":"2019-20"}],["LeBron James (2019-20)","LAL","PG",23,74,61,53,67,71,75,32,90,99,71,{"leg":1,"team":"Lakers","yr":"2019-20"}],["Luka Dončić (2019-20)","DAL","PG",48,59,71,60,65,65,74,24,88,99,81,{"leg":1,"team":"Mavericks","yr":"2019-20"}],["Anthony Davis (2019-20)","LAL","PF",3,67,79,80,88,81,69,84,55,57,80,{"leg":1,"team":"Lakers","yr":"2019-20"}],["Damian Lillard (2019-20)","POR","PG",0,92,85,50,58,68,79,27,87,99,49,{"leg":1,"team":"Trail Blazers","yr":"2019-20"}],["Kawhi Leonard (2019-20)","LAC","SF",2,84,82,60,72,91,78,35,66,73,67,{"leg":1,"team":"Clippers","yr":"2019-20"}],["Trae Young (2019-20)","ATL","PG",16,79,80,51,56,68,78,21,90,99,49,{"leg":1,"team":"Hawks","yr":"2019-20"}],["Russell Westbrook (2019-20)","HOU","PG",0,44,68,54,69,84,79,30,84,95,72,{"leg":1,"team":"Rockets","yr":"2019-20"}],["Bradley Beal (2019-20)","WAS","SG",81,76,79,56,59,71,84,30,75,83,48,{"leg":1,"team":"Wizards","yr":"2019-20"}],["Nikola Jokić (2019-20)","DEN","C",1,59,74,84,69,71,66,35,53,89,83,{"leg":1,"team":"Nuggets","yr":"2019-20"}],["Karl-Anthony Towns (2019-20)","MIN","C",64,94,74,89,74,61,58,53,49,69,90,{"leg":1,"team":"Timberwolves","yr":"2019-20"}],["Pascal Siakam (2019-20)","TOR","PF",5,78,68,65,68,65,67,44,54,60,68,{"leg":1,"team":"Raptors","yr":"2019-20"}],["Devin Booker (2019-20)","PHO","SG",61,76,88,55,55,55,71,27,75,86,48,{"leg":1,"team":"Suns","yr":"2019-20"}],["Jimmy Butler (2019-20)","MIA","SF",9,44,72,67,70,91,70,35,66,81,64,{"leg":1,"team":"Heat","yr":"2019-20"}]];
+const KK=['three','mid','dunk','def','steal','spd','block','drib','pass','reb'];
+const OVW={G:[.15,.12,.1,.12,.08,.1,.06,.1,.08,.09],F:[.12,.11,.12,.125,.07,.09,.075,.085,.075,.13],C:[.095,.10,.14,.135,.065,.08,.095,.07,.075,.145]},POSOFF={PG:-1.8,SG:.1,SF:-.4,PF:1.3,C:-1.4};
+const ovrRaw=p=>{const w=p.pos=='C'?OVW.C:p.pos=='PF'?OVW.F:OVW.G;return 75+(KK.reduce((a,k,i)=>a+w[i]*p[k],0)-72.5)*1.9+POSOFF[p.pos]};
+function finishOvr(p){
+  let o=ovrRaw(p);
+  if(p.leg){const t=Math.max(90,Math.min(99,90+(o-77)*9/22));
+    for(let n=0;n<6&&t>o+.3;n++){const d=(t-o)/1.9;for(const k of KK)p[k]=Math.min(99,Math.round(p[k]+d+.3));o=ovrRaw(p)}}
+  p.ovr=Math.min(99,Math.round(o));if(p.leg)p.ovr=Math.max(90,p.ovr);
+}
+const ROSTER=RAW.map(r=>{const p={name:r[0],tm:r[1],team:TEAMS[r[1]][0],col:TEAMS[r[1]][1],pos:r[2],num:r[3],three:r[4],mid:r[5],dunk:r[6],def:r[7],steal:r[8],spd:r[9],block:r[10],drib:r[11],pass:r[12],reb:r[13]};Object.assign(p,r[14]||{},EDIT[p.name]||{});for(const k of KK)p[k]=Math.round(99-(99-p[k])*.62);finishOvr(p);return p}).sort((a,b)=>b.ovr-a.ovr);
+const LBL=[["three","Triple"],["mid","Medio"],["dunk","Mate"],["def","Defensa"],["steal","Robo"],["spd","Velocidad"],["block","Tapón"],["drib","Regate"],["pass","Pase"],["reb","Rebote"]];
+const DFS=[{sp:.78,gp:.06,st:.6,bk:.5,dr:.5},{sp:.88,gp:.14,st:1,bk:1,dr:1},{sp:1,gp:.22,st:1.35,bk:1.5,dr:1.5}];
+const BENCHN={1:0,2:0,3:1,5:3},DEFK={up:'w',down:'s',left:'a',right:'d',shoot:'Space',pass:'f',drib:'q',subs:'b',pause:'p'},COARSE=matchMedia('(pointer:coarse)').matches;
+const kl=k=>k=='Space'?'Espacio':k.length==1?k.toUpperCase():k;
+let CFG={snd:1,sens:40,mode:1,sel:[0],diff:1,sw:'auto',tb:COARSE?1:0,keys:{...DEFK},auto:0,fb:''};
+try{Object.assign(CFG,JSON.parse(localStorage.getItem('cb_cfg2')||'{}'))}catch(e){}
+CFG.keys={...DEFK,...CFG.keys};
+let mode=CFG.mode,diff=CFG.diff,sel=(CFG.selN||[]).map(n=>ROSTER.findIndex(p=>p.name==n)).filter(i=>i>=0).slice(0,mode+BENCHN[mode]),DF=DFS[1];if(!sel.length)sel=[ROSTER.findIndex(p=>!p.leg)];
+const save=()=>{try{localStorage.setItem('cb_cfg2',JSON.stringify({...CFG,mode,selN:sel.map(i=>ROSTER[i].name),diff}))}catch(e){}};
+const $=id=>document.getElementById(id);
+const pills=(id,key,fn)=>document.querySelectorAll('#'+id+' button').forEach(b=>b.onclick=()=>{fn(+b.dataset[key]);menu()});
+const F={q:'',tm:'',pos:'',sort:'ovr',leg:'cur'};
+const SORTS=[['ovr','Valoración'],...LBL];
+const norm=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+function list(){
+  const q=norm(F.q.trim());
+  const a=ROSTER.map((p,i)=>[p,i]).filter(([p])=>(!q||norm(p.name).includes(q)||norm(p.team).includes(q))&&(!F.tm||p.tm==F.tm)&&(!F.pos||p.pos==F.pos)&&(F.leg=='all'||!!p.leg==(F.leg=='leg')));
+  a.sort((x,y)=>y[0][F.sort]-x[0][F.sort]);
+  $('list').innerHTML=a.slice(0,100).map(([p,i])=>`<button class="pl" data-i="${i}" aria-pressed="${sel.includes(i)}"><span class="dot" style="background:${p.col}">${p.pos}</span><span class="nm"><b>${p.name}</b><small>${p.team} · ${p.pos}</small></span><span class="ov">${p.ovr}</span><span class="ch">${LBL.map(([k,l])=>`<i>${l.slice(0,3)} <b>${p[k]}</b></i>`).join('')}</span></button>`).join('')||'<p class="sub">Sin resultados</p>';
+  $('res').textContent=a.length>100?`Mostrando 100 de ${a.length}: afina la búsqueda`:`${a.length} jugadores`;
+  document.querySelectorAll('.pl').forEach(c=>c.onclick=()=>{const i=+c.dataset.i,j=sel.indexOf(i);
+    if(j>=0)sel.splice(j,1);else if(sel.length<mode+BENCHN[mode])sel.push(i);else sel[mode+BENCHN[mode]-1]=i;menu()});
+}
+function menu(){
+  document.querySelectorAll('#mod button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.m==mode));
+  document.querySelectorAll('#swr button').forEach(b=>{b.setAttribute('aria-pressed',b.dataset.s==CFG.sw);b.onclick=()=>{CFG.sw=b.dataset.s;save();menu()}});$('swm').value=CFG.sw;
+  document.querySelectorAll('#dif button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.d==diff));
+  $('cnt').textContent=`Elegidos: ${sel.length}/${mode}${BENCHN[mode]?' + hasta '+BENCHN[mode]+' de banquillo':''}`;$('play').disabled=sel.length<mode;$('play').textContent='Jugar a '+(mode==5?21:11);
+  $('mine').innerHTML=sel.map((i,k)=>`<button data-r="${i}" style="border-color:${ROSTER[i].col}">${k>=mode?'Banq. · ':''}${ROSTER[i].name} ✕</button>`).join('');
+  document.querySelectorAll('#mine button').forEach(b=>b.onclick=()=>{sel.splice(sel.indexOf(+b.dataset.r),1);menu()});
+  list();
+}
+$('ftm').innerHTML='<option value="">Todos los equipos</option>'+Object.entries(TEAMS).sort((x,y)=>x[1][0].localeCompare(y[1][0])).map(([k,v])=>`<option value="${k}">${v[0]}</option>`).join('');
+$('fsort').innerHTML=SORTS.map(([k,l])=>`<option value="${k}">Orden: ${l}</option>`).join('');
+$('fq').oninput=e=>{F.q=e.target.value;list()};
+$('ftm').onchange=e=>{F.tm=e.target.value;$('best').disabled=!F.tm;list()};
+$('fpos').onchange=e=>{F.pos=e.target.value;list()};$('fleg').onchange=e=>{F.leg=e.target.value;list()};
+$('fsort').onchange=e=>{F.sort=e.target.value;list()};
+$('best').onclick=()=>{sel=ROSTER.map((p,i)=>i).filter(i=>ROSTER[i].tm==F.tm&&(F.leg=='all'||!!ROSTER[i].leg==(F.leg=='leg'))).slice(0,mode+BENCHN[mode]);menu()};
+pills('mod','m',m=>{mode=m;sel=sel.slice(0,m+BENCHN[m])});pills('dif','d',d=>diff=d);menu();
+
+// ---- Juego ----
+let AC=null;
+function initAudio(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state=='suspended')AC.resume()}
+function tone(f,d,type='sine',v=.15,f2){if(!CFG.snd||!AC)return;const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime;o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d)}
+function noise(d,v=.15,fq=2000){if(!CFG.snd||!AC)return;const n=AC.sampleRate*d|0,b=AC.createBuffer(1,n,AC.sampleRate),x=b.getChannelData(0);for(let i=0;i<n;i++)x[i]=(Math.random()*2-1)*(1-i/n);const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();f.type='bandpass';f.frequency.value=fq;g.gain.value=v;s.buffer=b;s.connect(f);f.connect(g);g.connect(AC.destination);s.start()}
+const SND={swish:()=>{noise(.35,.25,3500);tone(880,.15,'sine',.05)},rim:()=>{tone(300,.25,'triangle',.2,180);tone(520,.15,'square',.05)},bounce:()=>tone(110,.12,'sine',.25,60),steal:()=>{tone(700,.08,'square',.08);tone(500,.1,'square',.08)},block:()=>{noise(.12,.3,800);tone(160,.15,'sawtooth',.12)},buzz:()=>tone(150,.5,'sawtooth',.12),cheer:()=>noise(.9,.12,1200),pass:()=>noise(.08,.1,2500),win:()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.25,'triangle',.15),i*120)),lose:()=>[392,330,262].forEach((f,i)=>setTimeout(()=>tone(f,.3,'sawtooth',.08),i*160))};
+const sfx=n=>{try{SND[n]()}catch(e){}if(NET&&NET.role=='host'&&NET.ev)NET.ev.push(n)};
+function togglePause(){if(NET&&G&&!G.over){const v=$('pause').style.display!='flex';$('pause').style.display=v?'flex':'none';return}if(!G||G.over)return;G.paused=!G.paused;$('pause').style.display=G.paused?'flex':'none';keys={};joy.x=joy.y=0;G.chg=false}
+function box(){return G.all.map((o,i)=>{const s=o.st;return `<tr style="${o.t?'opacity:.75':''}"><td>${last1(o)}</td><td>${s.pts}</td><td>${s.fg}/${s.fga}</td><td>${s.t3}</td><td>${s.stl}</td><td>${s.blk}</td><td>${s.reb}</td><td>${s.ast}</td></tr>`}).join('')}
+const W=400,HX=200,HY=70,ARC=175;let H=600,TARGET=11,FULL=false;
+const cv=$('cv'),ctx=cv.getContext('2d');ctx.scale(2,2);
+let G=null,P=[],keys={},joy={id:null,ox:0,oy:0,x:0,y:0},tch=null,last=0,running=false;
+const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),hoopOf=t=>FULL?{x:HX,y:t?H-HY:HY,s:t?-1:1}:{x:HX,y:HY,s:1},hd=o=>{const h=hoopOf(o.t);return Math.hypot(o.x-h.x,o.y-h.y)};
+const T=t=>P.filter(o=>o.t==t),foes=o=>P.filter(q=>q.t!=o.t),mates=o=>P.filter(q=>q.t==o.t&&q!==o);
+const nearest=(l,r)=>l.reduce((a,b)=>dist(a,r)<dist(b,r)?a:b);
+const fpos=t=>.5+.5*Math.sin(t*5.5),qual=m=>clamp(1-Math.abs(m-.82)*4,0,1);
+const last1=o=>o.p.name.replace(/ (Jr\.|Sr\.|II|III|IV)$/,'').split(' ').pop().slice(0,10);
+const me=()=>P[G.ctl];
+function say(t){G.msg=t;G.mt=1.1}
+function hud(){$('s1').textContent=G.s[0];$('s2').textContent=G.s[1]}
+
+function start(){
+  DF=UTM?utDFt(UTM.t):DFS[diff];if(NETM)DF={sp:.88,gp:.2,st:1,bk:1,dr:1};if(!UTM&&!NET)save();initAudio();$('again').style.display=(UTM||NET)?'none':'';$('back').textContent=NET?'Salir':UTM?'Continuar':'Cambiar equipo';$('pause').style.display='none';
+  $('tb').style.display=CFG.tb?'flex':'none';FULL=mode==5;H=FULL?752:600;TARGET=FULL?21:11;cv.width=W*2;cv.height=H*2;ctx.setTransform(2,0,0,2,0,0);cv.style.aspectRatio=W+'/'+H;cv.style.height=`min(calc(100dvh - 120px),${H/W*100}vw)`;
+  const av=UTM?UTM.target:sel.reduce((t,i)=>t+ROSTER[i].ovr,0)/sel.length,sc=new Map(ROSTER.map((p,i)=>[i,Math.abs(p.ovr-av)+Math.random()*10]));let pool=ROSTER.map((_,i)=>i).filter(i=>!sel.includes(i)&&(sel.some(j=>ROSTER[j].leg)||!ROSTER[i].leg)).sort((a,b)=>sc.get(a)-sc.get(b)).slice(0,mode+(sel.length-mode));if(UTM&&UTM.opp)pool=UTM.opp.map(n=>IDX[n]);
+  const mk=(i,t)=>({p:typeof i=='object'?i:(UTM&&t==0&&UTM.pm&&UTM.pm[i])?UTM.pm[i]:ROSTER[i],t,st:{pts:0,fg:0,fga:0,t3:0,stl:0,blk:0,reb:0,ast:0},x:200,y:300,cd:0,bc:0,dc:0,jump:0,dash:0,frz:0,risk:0,en:100,mv:0,heat:0,spot:null,rT:0,hold:0,sT:0,off:35,lat:0,lng:false});
+  P=[...sel.slice(0,mode).map(i=>mk(i,0)),...pool.slice(0,mode).map(i=>mk(i,1))];const BN=[sel.slice(mode).map(i=>mk(i,0)),pool.slice(mode).map(i=>mk(i,1))];P.forEach(o=>{o.pl=1});if(NETM){P=[...NETM.t0.map(p=>mk(p,0)),...NETM.t1.map(p=>mk(p,1))];BN[0]=[];BN[1]=[];P.forEach(o=>{o.pl=1})}
+  G={s:[0,0],clock:FULL?24:12,ball:'held',own:null,need:false,chg:false,ch:0,fly:null,loose:null,pass:null,fight:null,msg:'',mt:0,over:false,ctl:0,paused:false,lp:null,bench:BN,all:[...P,...BN[0],...BN[1]].sort((a,b)=>a.t-b.t),subT:5,subsOpen:false};
+  setup(0);
+  names();
+  $('bC').style.display=G.bench[0].length?'':'none';hud();$('end').style.display='none';$('menu').style.display='none';$('game').style.display='flex';
+  say('¡Balón tuyo!');last=performance.now();
+  if(!running){running=true;requestAnimationFrame(loop)}
+}
+function give(o,clear){G.ball='held';G.own=o;G.clock=FULL?24:12;G.need=clear;G.chg=false;G.pass=null;G.fight=null;o.spot=null}
+function setup(t){
+  const A=T(t),D=T(1-t),n=A.length,h=hoopOf(t),bx=[200,70,330,130,270];
+  A.forEach((o,i)=>{o.x=bx[i];o.y=h.y+h.s*((FULL?430:255)+(i?25:0));o.spot=null;o.frz=0});
+  D.forEach((o,i)=>{const m=A[i%n];o.x=m.x;o.y=m.y-h.s*35;o.frz=0;o.spot=null});
+  give(A[0],false);
+}
+function blocked(x,y,t){const a=Math.random()*Math.PI*2;G.fly=null;G.ball='loose';G.chg=false;G.loose={x,y,vx:Math.cos(a)*170,vy:Math.sin(a)*170,t:0,k:t};sfx('block');say('¡TAPÓN!')}
+const statAt=o=>{const d=hd(o);return d<50?o.p.dunk:d<ARC?o.p.mid:o.p.three};
+const hwOf=o=>{const d=hd(o),df=nearest(foes(o),o),dd=dist(df,o),sf=.4+statAt(o)/100*.9;
+  const c=dd<70?1-(70-dd)/70*(.25+.45*df.p.def/100):dd>100?1.12:1;
+  return Math.min(.2,(.016+.15*Math.exp(-d/58))*sf*c*(1+.1*(o.heat||0))*(.8+.2*o.en/100))};
+function shoot(o,q){
+  const d=hd(o),df=nearest(foes(o),o),dd=dist(o,df);
+  if((o.t==0||NETM)&&dd<50&&Math.random()<df.p.block/100*.3*(1-dd/50)*DF.bk){df.jump=.4;df.st.blk++;blocked(o.x,o.y,0);return}
+  const stat=statAt(o),pts=d>ARC?3:2,green=q>=1-4*hwOf(o);o.st.fga++;
+  let p=(.12+.5*Math.exp(-d/80))*(stat/100)*(.25+.75*q*q);
+  if(dd<70)p*=1-(70-dd)/70*(.2+df.p.def/100*.5);else if(dd>100)p*=1.1;
+  p=clamp(p,.02,.3+.3*Math.exp(-d/80));
+  G.fly={o,t:0,dur:.65,fx:o.x,fy:o.y,hp:hoopOf(o.t),made:green,pts,dunk:d<50};G.ball='fly';G.chg=false;
+}
+function resolve(){
+  const f=G.fly,o=f.o;G.fly=null;
+  if(f.made){
+    G.s[o.t]+=f.pts;hud();{const s=o.st;s.pts+=f.pts;s.fg++;if(f.pts==3)s.t3++;const lp=G.lp;if(lp&&lp.to===o&&lp.from!==o&&performance.now()-lp.at<4000)lp.from.st.ast++}
+    o.heat=Math.min(3,Math.max(0,o.heat||0)+1);sfx('swish');setTimeout(()=>sfx('cheer'),150);
+    say(f.dunk?'¡MATE!':f.pts==3?'¡TRIPLE!':'¡Canasta!');
+    if(G.s[o.t]>=TARGET){G.ball='loose';G.loose={x:f.hp.x,y:f.hp.y,vx:0,vy:0,t:0,k:o.t};finish(o.t);return}
+    setup(1-o.t);
+  }else{
+    const d=Math.hypot(f.fx-f.hp.x,f.fy-f.hp.y),a=Math.PI*(.12+Math.random()*.76),sp=70+d*(.5+Math.random()*.9);
+    G.ball='loose';G.loose={x:f.hp.x,y:f.hp.y+8*f.hp.s,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp*f.hp.s,t:0,k:o.t};o.heat=Math.max(-2,Math.min(0,o.heat||0)-1);sfx('rim');say('¡Rebote!');
+  }
+}
+function finish(w){
+  G.over=true;sfx(w==0?'win':'lose');$('et').textContent=w==0?'¡Victoria!':'Derrota';
+  $('es').innerHTML=`<div style="font-size:34px;font-family:Anton,sans-serif">${G.s[0]} – ${G.s[1]}</div><table><tr><th></th><th>PTS</th><th>TC</th><th>3P</th><th>ROB</th><th>TAP</th><th>REB</th><th>AST</th></tr>${box()}</table>`;$('end').style.display='flex';if(UTM)utEnd(w);if(NET)netEnd(w);
+}
+function steal(o){
+  if(o.cd>0||G.ball!='held'||G.own.t==o.t)return;o.cd=1.5;const h=G.own;
+  if(dist(o,h)<34&&Math.random()<(.05+o.p.steal/100*.17-h.p.drib/100*.1)*(o.t==1?DF.st:1)*(h.risk>0?1.8:1)){
+    o.st.stl++;sfx('steal');give(o,hd(o)<ARC);say(o.t==0?'¡Robo!':'Te han robado');
+  }else if(o===me())say('Fallo');
+}
+function dribble(o){
+  if(G.ball!='held'||G.own!==o)return;
+  const d=nearest(foes(o),o);o.dc=1.6;o.dash=.3;o.risk=.9;o.en=Math.max(0,o.en-8);sfx('bounce');
+  if(dist(o,d)<70){
+    if(Math.random()<clamp(.2+o.p.drib/100*.5-d.p.def/100*.25,.05,.8)){d.frz=.7;say(o.t==0?'¡Le dejas atrás!':'Te ha regateado')}
+    else if(dist(o,d)<45&&Math.random()<.2+d.p.steal/100*.3){give(d,hd(d)<ARC);say(o.t==0?'¡Te lo roban al regatear!':'¡Robo en su regate!')}
+  }
+}
+function pass(o,tg){
+  const p={from:o,to:tg,t:0,dur:.35,fx:o.x,fy:o.y,int:null},vx=tg.x-o.x,vy=tg.y-o.y,l2=vx*vx+vy*vy||1;
+  for(const f of foes(o)){
+    const u=clamp(((f.x-o.x)*vx+(f.y-o.y)*vy)/l2,0,1),d=Math.hypot(o.x+vx*u-f.x,o.y+vy*u-f.y);
+    if(d<20&&!p.int&&Math.random()<(.1+f.p.steal/100*.25)*(1-o.p.pass/150)*(f.t==1?DF.st:1))p.int=f;
+  }
+  G.pass=p;G.ball='pass';G.chg=false;G.lp={from:o,to:tg,at:performance.now()};sfx('pass');
+}
+function cpuPass(o){
+  const ms=mates(o),open=m=>Math.min(...foes(o).map(f=>dist(f,m)));
+  const b=ms.reduce((a,c)=>open(a)>open(c)?a:c);if(open(b)>55)pass(o,b);
+}
+function blockBy(m){
+  if(m.bc>0||G.ball=='fight')return;m.bc=1.2;m.jump=.4;const f=G.fly;
+  if(f&&f.o.t!=m.t){
+    const dd=Math.hypot(m.x-f.fx,m.y-f.fy);
+    if(f.t<.5&&dd<55&&Math.random()<.15+m.p.block/100*.6*(1-dd/80)){m.st.blk++;blocked(f.fx,f.fy,f.o.t)}else if(m===me())say('Tapón fallido');
+  }
+}
+function actDown(){if(NET&&NET.role=='guest'){gAct();return}
+  if(!G||G.over)return;const m=me();
+  if(G.ball=='held'){
+    if(G.own===m){if(G.need){say('Sal del arco para tirar');return}G.chg=true;G.ch=0}
+    else if(G.own.t!=m.t)steal(m);
+  }else if(G.ball=='fly'&&G.fly.o.t!=m.t)blockBy(m);
+  else if(G.ball=='fight'&&G.fight.ms==null)G.fight.ms=1-Math.abs(fpos(G.fight.t)-.5)*2;
+}
+function actUp(){if(NET&&NET.role=='guest'){gUp();return}if(G&&G.chg&&G.ball=='held'&&G.own===me())shoot(G.own,qual(G.ch));if(G)G.chg=false}
+function actBlock(){if(G&&!G.over)blockBy(me())}
+function actDrib(){if(NET&&NET.role=='guest'){if(G&&!G.over)netSend({k:'drib'});return}if(G&&!G.over&&me().dc<=0)dribble(me())}
+function actPass(dx,dy){
+  if(!G||G.over||G.ball!='held'||G.own!==me())return;const ms=mates(me());if(!ms.length)return;
+  const m=me(),l=Math.hypot(dx,dy);
+  const sc=q=>l>.1?((q.x-m.x)*dx+(q.y-m.y)*dy)/(Math.hypot(q.x-m.x,q.y-m.y)||1)/l:-dist(q,m)/100;
+  pass(m,ms.reduce((a,c)=>sc(a)>sc(c)?a:c));
+}
+function move(o,tx,ty,dt,f){
+  const dx=tx-o.x,dy=ty-o.y,d=Math.hypot(dx,dy);
+  if(d<1||o.frz>0||(G.ball=='fight'&&(o===G.fight.a||o===G.fight.b)))return;
+  const sp=(70+o.p.spd*1.1)*(FULL?1.3:1)*(G.ball=='held'&&G.own===o?.9:1)*f*(o.dash>0?1.9:1)*(.75+.25*o.en/100)*(o.t==1?DF.sp/.88:1)*dt,st=Math.min(sp,d);
+  o.mv=st>1.2?1:0;o.en=Math.max(0,o.en-st*(o.dash>0?.1:.045));o.x=clamp(o.x+dx/d*st,18,W-18);o.y=clamp(o.y+dy/d*st,18,H-18);
+}
+function ai(o,dt){
+  if(G.ball=='fly'||G.ball=='fight')return;
+  if(G.ball=='loose'){const L=G.loose;if(o===nearest(T(o.t),L))move(o,L.x,L.y,dt,.95);return}
+  const bh=G.ball=='held'?G.own:G.pass.to,ot=bh.t;
+  if(o.t!=ot){
+    const A=T(ot),m=A[T(o.t).indexOf(o)%A.length];
+    o.sT-=dt;if(o.sT<=0){o.sT=.4+Math.random()*.9;o.off=26+Math.random()*34;o.lat=(Math.random()-.5)*70;o.lng=Math.random()<.18}
+    const hp=hoopOf(ot),dx=hp.x-m.x,dy=hp.y-m.y,d=Math.hypot(dx,dy)||1,ux=dx/d,uy=dy/d,off=m===bh?(o.lng?18:o.off):o.off+14;
+    move(o,m.x+ux*off-uy*o.lat,m.y+uy*off+ux*o.lat,dt,m===bh?.82:.78);
+    if(m===bh&&dist(o,m)<34&&Math.random()<dt*(o.lng?1.2:.35)*(o.t==1?DF.st:1))steal(o);
+    return;
+  }
+  o.rT-=dt;
+  if(o!==bh||G.ball!='held'){
+    if(!o.spot||o.rT<=0){const h=hoopOf(o.t);o.spot={x:40+Math.random()*320,y:h.y+h.s*(95+Math.random()*180)};o.rT=2+Math.random()*1.8}
+    move(o,o.spot.x,o.spot.y,dt,.75);return;
+  }
+  if(!o.spot||o.rT<=0){
+    const b=[['three',o.p.three],['mid',o.p.mid],['dunk',o.p.dunk]].sort((a,b)=>b[1]-a[1]+(Math.random()-.5)*30)[0][0];
+    let r=b=='three'?ARC+22:b=='mid'?110:38;if(G.need)r=Math.max(r,ARC+22);
+    const a=Math.PI*(.2+Math.random()*.6);
+    const h=hoopOf(o.t);o.spot={x:clamp(h.x+Math.cos(a)*r,25,375),y:h.y+h.s*Math.sin(a)*r};o.rT=2.6;o.hold=0;
+  }
+  move(o,o.spot.x,o.spot.y,dt,.95);
+  const nf=dist(nearest(foes(o),o),o);
+  if(dist(o,o.spot)<12){o.hold+=dt;if(o.hold>.4&&!G.need){shoot(o,Math.random()<Math.min(.9,DF.gp*(.5+statAt(o)/140)*(hd(o)<50?4.5:hd(o)<ARC?2.6:2)*(dist(nearest(foes(o),o),o)<50?.6:1))?1:0);return}}
+  if(nf<30&&Math.random()<dt*1.5)o.rT=0;
+  if(nf<45&&o.dc<=0&&Math.random()<dt*DF.dr*.8)dribble(o);
+  if(G.ball=='held'&&mates(o).length&&Math.random()<dt*(nf<45?.9:.12))cpuPass(o);
+}
+function switchPlayer(){
+  if(!G||G.over||G.paused||G.ball=='fight'||(G.ball=='held'&&G.own.t==0))return;
+  const r=G.ball=='held'?G.own:G.ball=='pass'?G.pass.to:G.ball=='fly'?G.fly.hp:G.loose,m=me();
+  const c=T(0).filter(o=>o!==m).sort((a,b)=>dist(a,r)-dist(b,r))[0];if(c)G.ctl=P.indexOf(c);
+}
+function autoCtl(){
+  if(G.ball=='fly'||G.ball=='fight')return;
+  if(G.ball=='held'&&G.own.t==0){G.ctl=P.indexOf(G.own);return}
+  if(G.ball=='pass'&&G.pass.to.t==0&&G.pass.from.t==0){G.ctl=P.indexOf(G.pass.to);return}
+  const r=G.ball=='held'?G.own:G.ball=='pass'?G.pass.to:G.loose,cur=me(),b=nearest(T(0),r);
+  if(cur.t!=0||(CFG.sw!='manual'&&dist(b,r)<dist(cur,r)-25))G.ctl=P.indexOf(b);
+}
+function looseStep(dt){
+  const b=G.loose;b.t+=dt;b.x+=b.vx*dt;b.y+=b.vy*dt;const f=Math.exp(-1.6*dt);b.vx*=f;b.vy*=f;
+  if(b.x<10||b.x>W-10){b.vx*=-.7;b.x=clamp(b.x,10,W-10)}
+  if(b.y<10||b.y>H-10){b.vy*=-.7;b.y=clamp(b.y,10,H-10)}
+  if(b.t<.3)return;
+  const a=nearest(T(0),b),c=nearest(T(1),b),na=dist(a,b)<20+a.p.reb/10,nc=dist(c,b)<20+c.p.reb/10;
+  if(na&&nc){G.ball='fight';G.ctl=P.indexOf(a);if(NET)G.ctl1=P.indexOf(c);G.fight={a,b:c,t:0,ms:null,cs:null,at:.3+Math.random()*.7};say('¡Balón dividido!')}
+  else if(na||nc){const o=na?a:c;o.st.reb++;give(o,o.t!=b.k&&hd(o)<ARC);say(o.t==b.k?(o.t==0?'Rebote de ataque':'Rebote rival'):(o.t==0?'Rebote defensivo':'Rebote rival'))}
+}
+function fightStep(dt){
+  const f=G.fight;f.t+=dt;
+  if(!NET&&f.cs==null&&f.t>=f.at)f.cs=1-Math.random()*(.55-f.b.p.reb/300)*2;
+  if(f.t>1.8&&f.ms==null)f.ms=0;
+  if(f.ms!=null&&f.cs!=null){const w=f.ms+f.a.p.reb/1000>=f.cs+f.b.p.reb/1000?f.a:f.b;w.st.reb++;give(w,w.t!=G.loose.k&&hd(w)<ARC);say(w.t==0?'¡Ganas la disputa!':'Pierdes la disputa')}
+}
+function update(dt){
+  if(G.mt>0)G.mt-=dt;
+  for(const o of P){o.cd-=dt;o.bc-=dt;o.dc-=dt;o.jump-=dt;o.dash-=dt;o.frz-=dt;o.risk-=dt;o.en=Math.min(100,o.en+(o.mv?3:14)*dt);o.mv=0}
+  for(const o of G.bench[0].concat(G.bench[1]))o.en=Math.min(100,o.en+8*dt);
+  aiSubs(dt);
+  autoCtl();if(NET)autoCtl1();const m=me();
+  const B=CFG.keys;let vx=(keys.ArrowRight||keys[B.right]?1:0)-(keys.ArrowLeft||keys[B.left]?1:0)+joy.x+padV.x,vy=(keys.ArrowDown||keys[B.down]?1:0)-(keys.ArrowUp||keys[B.up]?1:0)+joy.y+padV.y;
+  const l=Math.hypot(vx,vy);if(l>1){vx/=l;vy/=l}
+  if(l>.05)move(m,m.x+vx*100,m.y+vy*100,dt,1);
+  m.dir=[vx,vy];
+  if(NET&&NET.role=='host')netMove(dt);for(const o of P)if(o!==m&&!(NET&&o===P[G.ctl1]))ai(o,dt);
+  for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){
+    const a=P[i],b=P[j],d=dist(a,b);
+    if(d<26&&d>0){const p=(26-d)/2,ux=(a.x-b.x)/d,uy=(a.y-b.y)/d;a.x+=ux*p;a.y+=uy*p;b.x-=ux*p;b.y-=uy*p}
+  }
+  if(G.ball=='held'){
+    if(G.need&&hd(G.own)>ARC+4)G.need=false;
+    if(G.chg&&G.own===m)G.ch=Math.min(1,G.ch+dt/1.3);
+    G.clock-=dt;
+    if(G.clock<=0){const o=nearest(foes(G.own),G.own);sfx('buzz');say('Reloj de ataque');give(o,hd(o)<ARC)}
+  }else G.chg=false;
+  if(G.fly){G.fly.t+=dt;if(G.fly.t>=G.fly.dur)resolve()}
+  if(G.pass){const p=G.pass;p.t+=dt;if(p.t>=p.dur){
+    const c=G.clock,n=G.need;G.pass=null;
+    if(p.int){p.int.st.stl++;give(p.int,hd(p.int)<ARC);say(p.int.t==0?'¡Pase robado!':'Te han robado el pase')}else{give(p.to,n);G.clock=c}
+  }}
+  if(G.ball=='loose')looseStep(dt);
+  if(G.ball=='fight')fightStep(dt);
+  netTick(dt);
+  $('tip').textContent=G.ball=='held'?(G.own===m?(G.need?'Sal del arco de tres para poder tirar':'Suelta en la zona verde · '+(COARSE?'desliza ↑':kl(CFG.keys.drib))+' regatea · '+(COARSE?'Pase':kl(CFG.keys.pass))+' pasa'):G.own.t==1?'Defiende: '+(COARSE?'Robar':kl(CFG.keys.shoot))+' roba o tapona · '+(COARSE?'Cambio':kl(CFG.keys.pass))+' cambia':'Tu equipo ataca'):G.ball=='fight'?'Pulsa cuando la barra pase por el centro':G.ball=='loose'?'Balón suelto: corre a por él':'';
+}
+function endc(c,sg){
+  c.save();if(sg<0){c.translate(0,H);c.scale(1,-1)}
+  c.fillStyle='rgba(232,179,58,.35)';c.fillRect(140,0,120,190);
+  c.strokeStyle='rgba(255,255,255,.85)';c.lineWidth=2;c.strokeRect(140,0,120,190);
+  c.beginPath();c.arc(HX,190,40,0,7);c.stroke();
+  c.beginPath();c.arc(HX,HY,ARC,0,Math.PI);c.moveTo(25,0);c.lineTo(25,HY);c.moveTo(375,0);c.lineTo(375,HY);c.stroke();
+  c.lineWidth=4;c.beginPath();c.moveTo(170,40);c.lineTo(230,40);c.stroke();
+  c.strokeStyle='#e8622a';c.lineWidth=3;c.beginPath();c.arc(HX,HY-4,10,0,7);c.stroke();
+  c.restore();
+}
+function court(c){
+  c.fillStyle='#2b6f6a';c.fillRect(0,0,W,H);
+  c.strokeStyle='rgba(255,255,255,.85)';c.lineWidth=2;c.strokeRect(2,2,W-4,H-4);
+  endc(c,1);
+  if(FULL){endc(c,-1);c.beginPath();c.moveTo(0,H/2);c.lineTo(W,H/2);c.stroke();c.beginPath();c.arc(HX,H/2,45,0,7);c.stroke()}
+  else{c.beginPath();c.arc(HX,H,50,Math.PI,0);c.stroke()}
+}
+function labels(){
+  const m=me(),hb=G.ball=='held',own=hb&&G.own===m;
+  $('bA').textContent=own?'Tirar':hb?'Robar':G.ball=='fly'&&G.fly.o.t!=m.t?'Tapón':G.ball=='fight'?'¡Ya!':'·';
+  $('bB').textContent=own?'Pase':'Cambio';
+}
+function draw(){labels();
+  const c=ctx;c.clearRect(0,0,W,H);
+  court(c);
+  const m=me();
+  [...P].sort((a,b)=>a.y-b.y).forEach(o=>{
+    if(o===m){c.fillStyle='rgba(255,255,255,.3)';c.beginPath();c.arc(o.x,o.y+3,20,0,7);c.fill()}
+    c.globalAlpha=o.frz>0?.5:1;
+    c.fillStyle=o.p.col;c.beginPath();c.arc(o.x,o.y,14+(o.jump>0?5:0),0,7);c.fill();
+    c.strokeStyle=o.t==0?'#fff':'#15181c';c.lineWidth=2.5;c.stroke();
+    c.fillStyle='#fff';c.font='700 13px Barlow Condensed,sans-serif';c.textAlign='center';c.textBaseline='middle';
+    c.fillText(o.p.num,o.x,o.y+1);c.font='600 11px Barlow Condensed,sans-serif';c.fillText(last1(o),o.x,o.y+25);c.globalAlpha=1;
+    c.fillStyle='rgba(0,0,0,.45)';c.fillRect(o.x-12,o.y-24,24,3);c.fillStyle=o.en>35?'#7bdc8a':'#ff7b5c';c.fillRect(o.x-12,o.y-24,24*o.en/100,3);
+    if(o.heat>=2||o.heat<=-2){c.font='13px sans-serif';c.fillText(o.heat>0?'🔥':'❄️',o.x,o.y-33)}
+  });
+  let bx,by;
+  if(G.ball=='fly'){const f=G.fly,u=f.t/f.dur;bx=f.fx+(f.hp.x-f.fx)*u;by=f.fy+(f.hp.y-f.fy)*u-Math.sin(Math.PI*u)*70}
+  else if(G.ball=='pass'){const p=G.pass,u=p.t/p.dur;bx=p.fx+(p.to.x-p.fx)*u;by=p.fy+(p.to.y-p.fy)*u}
+  else if(G.ball=='loose'||G.ball=='fight'){bx=G.loose.x;by=G.loose.y}
+  else{const o=G.own;bx=o.x+(o.t==0?16:-16);by=o.y+8+Math.abs(Math.sin(performance.now()/160))*8}
+  c.fillStyle='#f08a24';c.beginPath();c.arc(bx,by,6.5,0,7);c.fill();c.strokeStyle='#4a2308';c.lineWidth=1;c.stroke();
+  if(G.chg){c.fillStyle='rgba(0,0,0,.5)';c.fillRect(100,(H-22),200,14);c.fillStyle='#43c06b';c.fillRect(100+200*(.82-hwD()),(H-22),400*hwD(),14);c.fillStyle='#fff';c.fillRect(100+200*G.ch-2,(H-26),4,22)}
+  if(G.ball=='fight'){const f=G.fight;c.fillStyle='rgba(0,0,0,.55)';c.fillRect(100,(H-22),200,14);c.fillStyle='#43c06b';c.fillRect(190,(H-22),20,14);c.fillStyle=f.ms==null?'#fff':'#e8b33a';c.fillRect(100+200*fpos(f.t)-2,(H-26),4,22)}
+  if(G.ball=='held'){c.fillStyle=G.clock<4?'#ffb199':'rgba(255,255,255,.8)';c.font='400 22px Anton,sans-serif';c.textAlign='right';c.fillText(Math.ceil(G.clock),W-12,H-12)}
+  if(G.mt>0){c.globalAlpha=Math.min(1,G.mt*2);c.fillStyle='#fff';c.font='400 34px Anton,sans-serif';c.textAlign='center';c.fillText(G.msg,W/2,H/2+10);c.globalAlpha=1}
+}
+function loop(t){
+  if(!G){running=false;return}
+  const dt=Math.min(.05,(t-last)/1000);last=t;
+  try{padPoll();if(!G.over&&!G.paused)(NET&&NET.role=='guest'?guestUpdate:update)(dt);draw()}catch(e){console.error(e)}
+  requestAnimationFrame(loop);
+}
+// ---- Entrada ----
+// ---- Ultimate Team ----
+let UTM=null,U=null,utTab='obj',slotSel=null,lastPack=null,utF={q:'',sort:'ovr',pos:''},armed=false;
+const IDX=Object.fromEntries(ROSTER.map((p,i)=>[p.name,i]));
+const rnd=a=>a[Math.random()*a.length|0];
+const rndW=(a,w)=>{const ws=a.map(w),t=ws.reduce((x,y)=>x+y,0);let r=Math.random()*t;for(let i=0;i<a.length;i++){r-=ws[i];if(r<=0)return a[i]}return a[a.length-1]};
+const newId=()=>Math.random().toString(36).slice(2,8).toUpperCase();
+const INP='background:var(--card);color:var(--fg);border:2px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit';
+const utSave=()=>{try{localStorage.setItem('cb_ut',JSON.stringify(U))}catch(e){}};
+try{U=JSON.parse(localStorage.getItem('cb_ut')||'null')}catch(e){}
+if(U&&(!U.coll||!U.squad||U.squad.some(n=>!(n in IDX))))U=null;
+if(U){U.dups=U.dups||[];U.used=U.used||[];U.out=U.out||[];U.id=U.id||newId();U.up=U.up||{};U.tour=U.tour||null;U.free=U.free||{};U.surv=U.surv||null;U.duel=U.duel||null;U.duelDone=U.duelDone||[]}
+const utDFt=t=>({sp:.76+.26*t,gp:.05+.2*t,st:.5+.9*t,bk:.4+1.1*t,dr:.4+1.1*t});
+const TIERS=[['Bronce','#b07a4a'],['Plata','#aab0b8'],['Oro','#e0b020'],['Élite','#8a5cf6'],['Leyenda','#ff5a5a']];
+const tierOf=p=>p.leg?4:p.ovr<70?0:p.ovr<80?1:p.ovr<88?2:3;
+const OBJK={pts:{g:[10,15,20,25],team:1},t3:{g:[3,4,5,6]},stl:{g:[3,4,5,6]},blk:{g:[2,3,4]},ast:{g:[4,6,8,10]},reb:{g:[8,12,16,20]},win:{g:[2,3]}};
+const objText=o=>({pts:`Mete ${o.goal} puntos con jugadores de los ${o.team?TEAMS[o.team][0]:''}`,t3:`Anota ${o.goal} triples`,stl:`Consigue ${o.goal} robos`,blk:`Pon ${o.goal} tapones`,ast:`Reparte ${o.goal} asistencias`,reb:`Captura ${o.goal} rebotes`,win:`Gana ${o.goal} partidos`}[o.kind]);
+function newObj(){
+  for(let t=0;t<40;t++){
+    const kind=rnd(Object.keys(OBJK)),def=OBJK[kind],goal=rnd(def.g),team=def.team?rnd(U.coll.map(n=>ROSTER[IDX[n]].tm)):null;
+    if(U.objs.some(o=>o.kind==kind&&o.team==team))continue;
+    return{kind,goal,team,prog:0,rw:kind=='win'||goal>=25?2:1};
+  }
+  return{kind:'t3',goal:3,team:null,prog:0,rw:1};
+}
+function utNew(){
+  const pool=ROSTER.filter(p=>p.ovr<68&&!p.leg).sort(()=>Math.random()-.5).slice(0,8);
+  U={id:newId(),up:{},tour:null,free:{},surv:null,duel:null,duelDone:[],out:[],dups:[],used:[],coll:pool.map(p=>p.name),squad:pool.map(p=>p.name),tok:1,div:10,played:0,wins:0,objs:[],fmt:5};
+  while(U.objs.length<4)U.objs.push(newObj());
+  utSave();
+}
+function utEnd(w,ab){
+  if(UTM.tour){tourEnd(w,ab);return}if(UTM.surv){survEnd(w,ab);return}if(UTM.duel){duelEnd(w,ab);return}
+  const win=w==0;if(!ab)U.tok++;U.played++;if(win)U.wins++;
+  if(!ab){
+    const t0=G.all.filter(o=>o.t==0),sum=f=>t0.reduce((a,o)=>a+o.st[f],0);
+    U.objs.forEach(o=>{if(o.prog>=o.goal)return;
+      const inc=o.kind=='win'?(win?1:0):o.kind=='pts'?t0.filter(x=>x.p.tm==o.team).reduce((a,x)=>a+x.st.pts,0):sum(o.kind);
+      o.prog=Math.min(o.goal,o.prog+inc)});
+  }
+  let msg=ab?'Partido abandonado: cuenta como derrota':'+1 ficha de sobre';
+  if(U.played>=10){
+    if(U.wins>=6){U.tok+=10;msg+=U.div==1?' · ¡Temporada completada! +10 fichas':` · ¡Subes a la división ${U.div-1}! +10 fichas`;U.div=Math.max(1,U.div-1)}
+    else msg+=` · ${U.wins}/10 victorias: necesitas 6 para subir, repites la división`;
+    U.played=0;U.wins=0;
+  }
+  utSave();if(!ab)$('es').innerHTML+=`<p>${msg}</p>`;
+}
+function utBack(){mode=UTM.restore.mode;sel=UTM.restore.sel;UTM=null;utShow()}
+function utPlay(tour,sv,du){
+  const n=du?U.duel.n:sv?U.surv.n:U.fmt,SQ=sv?U.surv.pick:U.squad,st=SQ.slice(0,n),bn=sv?SQ.slice(n,n+BENCHN[n]):U.squad.slice(5,5+BENCHN[n]);
+  const TL=tour&&TOUR[U.tour.lvl],tt=tour?TL.t[0]+(TL.t[1]-TL.t[0])*U.tour.round/3:du?U.duel.t:sv?Math.min(1,.05+.95*U.surv.round/14):(10-U.div)/9;
+  UTM={div:U.div,t:tt,tour:!!tour,surv:!!sv,duel:!!du,opp:du?U.duel.opp[U.duel.res.length]:null,target:60+31.5*tt,restore:{mode,sel:[...sel]}};
+  const cb=chem(n,SQ);UTM.pm={};st.forEach((nm,i)=>{UTM.pm[IDX[nm]]=chemP(upP(ROSTER[IDX[nm]]),cb[i])});bn.forEach(nm=>{UTM.pm[IDX[nm]]=upP(ROSTER[IDX[nm]])});
+  mode=n;sel=[...st,...bn].map(x=>IDX[x]);
+  $('ut').style.display='none';start();
+}
+function goHome(){$('onl').style.display='none';$('menu').style.display='none';$('ut').style.display='none';$('home').style.display='block'}
+function utShow(){clearInterval(duTimer);
+  revId++;
+  $('home').style.display='none';$('menu').style.display='none';$('ut').style.display='block';
+  const tabs=$('utTabs');
+  if(!U){tabs.style.visibility='hidden';$('utTok').textContent='';
+    $('utBody').innerHTML='<p class="sub">Empiezas con un equipo de jugadores flojos y una ficha de sobre. Juega partidos en las divisiones (de la 10 a la 1), cumple objetivos y abre sobres para mejorar tu plantilla.</p><button class="go" id="utStart">Empezar</button>';
+    $('utStart').onclick=()=>{utNew();utShow()};return}
+  tabs.style.visibility='visible';$('utTok').textContent='Fichas: '+U.tok;
+  tabs.querySelectorAll('button[data-t]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.t==utTab));
+  ({obj:vObj,div:vDiv,tour:vTour,surv:vSurv,duel:vDuel,shop:vShop,team:vTeam})[utTab]();
+}
+function vObj(){
+  $('utBody').innerHTML='<p class="sub">Los objetivos se renuevan al reclamarlos y su progreso se acumula entre partidos de Ultimate Team.</p>'+U.objs.map((o,i)=>`<div class="oc"><div><b>${objText(o)}</b><small>Recompensa: ${o.rw} ficha${o.rw>1?'s':''}</small><i class="pb"><u style="width:${o.prog/o.goal*100}%"></u></i></div><span>${o.prog}/${o.goal}</span><button data-i="${i}" ${o.prog>=o.goal?'':'disabled'}>Reclamar</button></div>`).join('');
+  $('utBody').querySelectorAll('.oc button').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;U.tok+=U.objs[i].rw;U.objs[i]=newObj();utSave();utShow()});
+}
+function vDiv(){
+  const t=Math.round(60+(10-U.div)*3.5);
+  $('utBody').innerHTML=`<h2>División ${U.div}</h2><p>Partidos: ${U.played}/10 · Victorias: ${U.wins} (hacen falta 6 de 10 para subir)</p><i class="pb"><u style="width:${U.played*10}%"></u></i>
+  <p class="sub">Rivales de nivel ~${t}. Cada partido da 1 ficha; al subir de división, 10 fichas.</p><p>Química de tus titulares: +${(chem(U.fmt).reduce((a,b)=>a+b,0)/U.fmt).toFixed(1)} de media a todas sus estadísticas.</p>
+  <p>${[10,9,8,7,6,5,4,3,2,1].map(d=>`<span class="dv ${d==U.div?'on':d>U.div?'done':''}">${d}</span>`).join(' ')}</p>
+  <h2>Formato</h2><div class="row" id="utFmt">${[1,2,3,5].map(n=>`<button data-n="${n}" aria-pressed="${U.fmt==n}">${n}v${n}</button>`).join('')}</div>
+  ${U.fmt==5&&!shapeOk(U.squad.slice(0,5))?`<p class="sub">${SHAPE_MSG}</p>`:''}<button class="go" id="utPlay" style="margin-top:16px" ${U.fmt==5&&!shapeOk(U.squad.slice(0,5))?'disabled':''}>Jugar partido</button>`;
+  $('utFmt').querySelectorAll('button').forEach(b=>b.onclick=()=>{U.fmt=+b.dataset.n;utSave();vDiv()});
+  $('utPlay').onclick=()=>utPlay(false);
+}
+const GRP=p=>p.pos=='PG'||p.pos=='SG'?'G':p.pos=='C'?'C':'F';
+const SHAPE_MSG='Alineación no válida para 5v5: hacen falta 2 bases/escoltas y, entre aleros/alapívots y pívots, 2 y 1 o 1 y 2.';
+function shapeOk(names){const g=names.map(n=>GRP(ROSTER[IDX[n]])),c=x=>g.filter(y=>y==x).length;return names.length==5&&c('G')==2&&((c('F')==2&&c('C')==1)||(c('F')==1&&c('C')==2))}
+function bestFive(all){
+  const gr=g=>all.filter(p=>GRP(p)==g).slice(0,8);
+  const comb=(a,k)=>{const o=[];const go=(s,f)=>{if(s.length==k){o.push([...s]);return}for(let i=f;i<a.length;i++){s.push(a[i]);go(s,i+1);s.pop()}};go([],0);return o};
+  const Gs=gr('G'),Fs=gr('F'),Cs=gr('C');let best=null,bs=-1;
+  for(const [nf,nc] of [[2,1],[1,2]])for(const g of comb(Gs,2))for(const f of comb(Fs,nf))for(const c of comb(Cs,nc)){
+    const st=[...g,...f,...c],sc=st.reduce((a,p,i)=>a+effOvr(p)+.5*Math.min(4,st.filter((q,j)=>j!=i&&q.tm==p.tm).length),0);
+    if(sc>bs){bs=sc;best=st}
+  }
+  return best;
+}
+const SV_BASE=[0,0,1,1,2,3,4,6,8],SV_MULT={1:1,2:1.5,3:2,5:3},SV_COST={1:2,2:3,3:4,5:6};
+const survAvail=()=>U.coll.filter(n=>!U.surv.used.includes(n)).map(n=>ROSTER[IDX[n]]);
+function survAuto(){
+  const S=U.surv,n=S.n,all=survAvail().sort((a,b)=>effOvr(b)-effOvr(a));let st;
+  if(n==5){st=bestFive(all);if(!st)return null}else{if(all.length<n)return null;st=all.slice(0,n)}
+  const rest=all.filter(p=>!st.includes(p)).slice(0,BENCHN[n]);
+  return [...st.sort((a,b)=>effOvr(b)-effOvr(a)),...rest].map(p=>p.name);
+}
+const SV_INC=[0,1,0,1,1,1,2,2];
+function survWin(S){
+  const k=S.wins,n=S.n,base=k<=8?SV_INC[k-1]:Math.min(5,2+Math.floor((k-9)/10)),f=Math.round(base*SV_MULT[n]);
+  U.tok+=f;const g=[];if(f)g.push(`${f} ficha${f>1?'s':''}`);
+  const fp=id=>{U.free[id]=(U.free[id]||0)+1;g.push('1 '+PACKS.find(p=>p.id==id).name.toLowerCase()+' gratis')};
+  if(k==4)fp('std');if(k==6)fp('tm');if(k==8&&n>=3)fp('pre');
+  if(k>=10&&k%10==0)fp('std');if(k>=20&&k%20==0)fp('pre');if(k==100)fp('leg');
+  return g.length?'+'+g.join(' · '):'';
+}
+function endRun(){const S=U.surv;U.survMsg=`Última run (${S.n}v${S.n}): ${S.wins} victoria${S.wins==1?'':'s'}.`;U.surv=null}
+function survEnd(w,ab){
+  const S=U.surv,win=w==0&&!ab;if(!ab)utObjProg(w==0);
+  G.all.filter(o=>o.t==0&&o.pl).forEach(o=>{if(!S.used.includes(o.p.name))S.used.push(o.p.name)});
+  let msg;
+  if(win){
+    S.wins++;S.round++;const r=survWin(S);
+    if(survAuto()){S.pick=[];msg=`Victoria ${S.wins}${r?': '+r:''}. Elige tu plantilla para la ronda ${S.round+1}.`}
+    else{msg=`Victoria ${S.wins}${r?': '+r:''}. Te quedas sin jugadores disponibles: fin de la run.`;endRun()}
+  }else{msg=`${ab?'Run abandonada':'Has caído'} con ${S.wins} victoria${S.wins==1?'':'s'}.`;endRun()}
+  utSave();if(!ab)$('es').innerHTML+=`<p>${msg}</p>`;
+}
+function vSurv(){
+  const B=$('utBody'),S=U.surv;
+  if(!S){
+    const n=U.survFmt||3,m=SV_MULT[n];
+    B.innerHTML=`<p class="sub">Una run infinita en un único formato: sigues hasta que pierdas, abandones o te quedes sin jugadores. Los jugadores que juegan una ronda ya no se pueden usar más en esa run (al terminar vuelven a estar disponibles). Los rivales empiezan muy flojos y van subiendo hasta el máximo nivel. Antes de cada ronda eliges tu plantilla entre los jugadores que te quedan.</p>
+    <div class="row" id="svF">${[1,2,3,5].map(k=>`<button data-n="${k}" aria-pressed="${n==k}">${k}v${k}</button>`).join('')}</div>
+    <p>Entrada: ${SV_COST[n]} fichas · Recompensa de fichas ×${m}</p>
+    <p class="sub">Cada victoria da fichas al momento. Las 8 primeras: ${SV_INC.map(x=>Math.round(x*m)).join(' · ')}. Después, ${Math.round(2*m)} por victoria, y sube un poco cada 10 victorias (hasta ${Math.round(5*m)}). Sobres gratis: 4 victorias, estándar; 6, de equipo${n>=3?'; 8, premium':''}; cada 10 victorias, estándar; cada 20, premium; y a las 100 victorias, un sobre de leyendas.</p>
+    <button class="go" id="svGo" ${U.tok<SV_COST[n]?'disabled':''}>Empezar (${SV_COST[n]} fichas)</button>${U.survMsg?`<p class="sub">${U.survMsg}</p>`:''}`;
+    $('svF').querySelectorAll('button').forEach(b=>b.onclick=()=>{U.survFmt=+b.dataset.n;utSave();vSurv()});
+    $('svGo').onclick=()=>{
+      if(U.tok<SV_COST[n])return;
+      U.surv={n,round:0,wins:0,used:[],pick:[]};
+      if(!survAuto()){U.surv=null;U.survMsg='No tienes jugadores suficientes para ese formato'+(n==5?' (hace falta una alineación válida)':'')+'.';vSurv();return}
+      U.tok-=SV_COST[n];U.survMsg='';utSave();utShow();
+    };
+    return;
+  }
+  const av=survAvail().sort((a,b)=>effOvr(b)-effOvr(a)),need=S.n+BENCHN[S.n],bad=S.n==5&&!shapeOk(S.pick.slice(0,5));
+  const tt=Math.min(1,.05+.95*S.round/14),avg=S.pick.length?Math.round(S.pick.slice(0,S.n).reduce((a,n)=>a+effOvr(ROSTER[IDX[n]]),0)/Math.min(S.n,S.pick.length)):0;
+  B.innerHTML=`<h2>Supervivencia ${S.n}v${S.n} · Ronda ${S.round+1}</h2><p>Victorias: ${S.wins} · Rival de esta ronda: nivel ~${Math.round(60+31.5*tt)} · Disponibles: ${av.length} · Ya usados: ${S.used.length}</p>
+  <p class="sub">Elige tu plantilla para esta ronda: los jugadores que juegan ya no se podrán repetir. Si el rival es flojo, guarda a tus mejores.</p>
+  <p>Plantilla: ${S.pick.map((n,i)=>(i<S.n?'':'Banq. ')+n).join(' · ')||'—'}${avg?` · titulares con ${avg} de media`:''}</p>
+  <div class="row"><button id="svAuto">Mejor alineación disponible</button><button id="svClr">Vaciar</button></div>${bad?`<p class="sub">${SHAPE_MSG}</p>`:''}
+  <button class="go" id="svPlay" ${S.pick.length<S.n||bad?'disabled':''}>Jugar ronda ${S.round+1}</button><div class="row"><button id="svQuit">Abandonar run</button></div>
+  <h2>Jugadores disponibles</h2><p class="sub">Toca para añadir o quitar. Los primeros ${S.n} son titulares${BENCHN[S.n]?' y el resto, banquillo (máximo '+BENCHN[S.n]+')':''}.</p><div id="svL"></div>`;
+  $('svL').innerHTML=av.map(p=>`<button class="pl t${tierOf(p)}" data-n="${p.name}" aria-pressed="${S.pick.includes(p.name)}"><span class="dot" style="background:${p.col}">${p.pos}</span><span class="nm"><b>${p.name}</b><small>${p.team} · ${p.pos}</small></span><span class="ov">${effOvr(p)}</span></button>`).join('');
+  $('svL').querySelectorAll('.pl').forEach(b=>b.onclick=()=>{const nm=b.dataset.n;if(S.pick.includes(nm))S.pick=S.pick.filter(x=>x!=nm);else if(S.pick.length<need)S.pick.push(nm);utSave();vSurv()});
+  $('svAuto').onclick=()=>{S.pick=survAuto()||[];utSave();vSurv()};
+  $('svClr').onclick=()=>{S.pick=[];utSave();vSurv()};
+  $('svPlay').onclick=()=>utPlay(false,true);
+  $('svQuit').onclick=()=>{endRun();utSave();utShow()};
+}
+const MAXUP=8,lvl=n=>(U&&U.up&&U.up[n])||0,effOvr=p=>Math.min(99,p.ovr+lvl(p.name));
+const upCost=p=>1+Math.floor(Math.max(0,effOvr(p)-66)/7);
+const upP=p=>{const L=lvl(p.name);if(!L)return p;const q={...p};for(const k of STK)q[k]=Math.min(99,Math.round(p[k]+L*.53));q.ovr=effOvr(p);return q};
+const TOUR=[{n:'Fácil',cost:2,t:[0,.25],pay:[0,1,2,5]},{n:'Medio',cost:4,t:[.4,.7],pay:[1,2,4,10]},{n:'Difícil',cost:7,t:[.75,1],pay:[2,4,8,22]}];
+const ROUNDN=['Octavos','Cuartos','Semifinales','Final'];
+let revId=0;
+const cardHtml=({p,dup})=>`<div class="cd t${tierOf(p)}"><b>${p.name}</b><small>${p.team} · ${p.pos}</small><span class="ov">${p.ovr}</span><em>${TIERS[tierOf(p)][0]}${dup?' · REPETIDO':' · NUEVO'}</em></div>`;
+function reveal(arr){
+  const id=++revId,n=arr.length,gap=n>6?110:650,wait=ms=>new Promise(r=>setTimeout(r,ms));
+  $('utBody').innerHTML=`<div class="row"><button id="rvSkip">Saltar</button></div><div id="rvCnt" style="height:46px;font-family:Anton,sans-serif;font-size:38px;text-align:center"></div><div class="cards" id="rvC">${arr.map(()=>'<div class="cd bk">?</div>').join('')}</div>`;
+  const els=[...$('rvC').children];let i=0,skip=false;
+  const show=k=>{const e=els[k];if(e&&e.parentNode)e.outerHTML=cardHtml(arr[k]).replace('class="cd','class="cd rv')};
+  const fin=()=>{if(id!==revId)return;$('rvCnt').textContent='';$('rvSkip').textContent='Continuar';$('rvSkip').onclick=utShow};
+  $('rvSkip').onclick=()=>{skip=true;for(let k=0;k<n;k++)show(k);fin()};
+  (async()=>{
+    for(;i<n&&!skip;i++){
+      if(id!==revId)return;const t=tierOf(arr[i].p);
+      if(t>=3&&n<=6){for(const c of ['3','2','1']){if(skip||id!==revId)break;$('rvCnt').textContent=c;await wait(380)}if(id===revId)$('rvCnt').textContent=''}
+      else if(t>=3){$('rvCnt').textContent=t==4?'¡LEYENDA!':'¡ÉLITE!';await wait(500);if(id===revId)$('rvCnt').textContent=''}
+      else await wait(t==2?gap+250:gap);
+      if(id!==revId)return;if(skip)break;show(i);
+    }
+    if(id!==revId)return;
+    for(let k=i;k<n;k++)show(k);fin();
+  })();
+}
+function upgrade(n){
+  const p=ROSTER[IDX[n]],c=upCost(p),have=U.dups.filter(x=>x==n).length;
+  if(lvl(n)>=MAXUP||effOvr(p)>=99||have<c)return;
+  let r=c;U.dups=U.dups.filter(x=>!(x==n&&r-->0));U.up[n]=lvl(n)+1;utSave();vTeam();
+}
+function upList(){
+  const names=[...new Set(U.dups)];
+  $('ul').innerHTML=names.length?names.map(n=>{const p=ROSTER[IDX[n]],have=U.dups.filter(x=>x==n).length,c=upCost(p),L=lvl(n),mx=L>=MAXUP||effOvr(p)>=99;
+    return `<div class="oc"><div><b>${p.name}</b><small>${p.team} · ${p.pos} · media ${effOvr(p)}${mx?' (máximo)':' → '+(effOvr(p)+1)} · nivel ${L}/${MAXUP}</small><small>Necesita ${c} copia${c>1?'s':''} · tienes ${have}</small></div><button data-u="${n.replace(/"/g,'&quot;')}" ${mx||have<c?'disabled':''}>Mejorar</button></div>`}).join(''):'<p class="sub">Cuando tengas repetidos aparecerán aquí para mejorar a ese jugador.</p>';
+  $('ul').querySelectorAll('button').forEach(b=>b.onclick=()=>upgrade(b.dataset.u));
+}
+function utObjProg(win){
+  const t0=G.all.filter(o=>o.t==0),sum=f=>t0.reduce((a,o)=>a+o.st[f],0);
+  U.objs.forEach(o=>{if(o.prog>=o.goal)return;
+    const inc=o.kind=='win'?(win?1:0):o.kind=='pts'?t0.filter(x=>x.p.tm==o.team).reduce((a,x)=>a+x.st.pts,0):sum(o.kind);
+    o.prog=Math.min(o.goal,o.prog+inc)});
+}
+function tourEnd(w,ab){
+  const tr=U.tour,win=w==0&&!ab;if(!ab)utObjProg(w==0);
+  let msg;
+  if(win){
+    const pay=TOUR[tr.lvl].pay,inc=pay[tr.round]-(tr.round?pay[tr.round-1]:0);U.tok+=inc;
+    if(tr.round==3){msg=`¡Campeón del torneo! +${inc} fichas (${pay[3]} en total)`;U.tour=null}
+    else{msg=`Ronda superada: +${inc} ficha${inc==1?'':'s'}. Siguiente: ${ROUNDN[tr.round+1]}`;tr.round++}
+  }else{msg=ab?'Torneo abandonado':'Has sido eliminado del torneo';U.tour=null}
+  utSave();if(!ab)$('es').innerHTML+=`<p>${msg}</p>`;
+}
+function vTour(){
+  const tr=U.tour,B=$('utBody');
+  if(tr){
+    const L=TOUR[tr.lvl];
+    B.innerHTML=`<h2>Torneo ${L.n} · ${ROUNDN[tr.round]}</h2><p>Fichas acumuladas al ganar cada ronda: ${L.pay.map((x,i)=>`${ROUNDN[i]} ${x}`).join(' · ')}.</p><p class="sub">Si pierdes quedas eliminado y te quedas con lo ya ganado. Formato: ${U.fmt}v${U.fmt} (cámbialo en Temporadas).</p>${U.fmt==5&&!shapeOk(U.squad.slice(0,5))?`<p class="sub">${SHAPE_MSG}</p>`:''}<button class="go" id="trPlay" ${U.fmt==5&&!shapeOk(U.squad.slice(0,5))?'disabled':''}>Jugar ${ROUNDN[tr.round]}</button><div class="row"><button id="trQuit">Abandonar torneo</button></div>`;
+    $('trPlay').onclick=()=>utPlay(true);$('trQuit').onclick=()=>{U.tour=null;utSave();vTour()};
+    return;
+  }
+  B.innerHTML='<p class="sub">Copas de eliminatoria de 4 partidos (octavos, cuartos, semifinales y final). Cuanto más difícil, más caro es entrar y mejor es el premio.</p>'+TOUR.map((L,i)=>`<div class="oc"><div><b>Torneo ${L.n}</b><small>Rivales de nivel ${Math.round(60+31.5*L.t[0])} a ${Math.round(60+31.5*L.t[1])} · Campeón: ${L.pay[3]} fichas</small><small>Por ronda: ${L.pay.join(' · ')}</small></div><span>${L.cost} fichas</span><button data-l="${i}" ${U.tok<L.cost?'disabled':''}>Entrar</button></div>`).join('');
+  B.querySelectorAll('button[data-l]').forEach(b=>b.onclick=()=>{const L=TOUR[+b.dataset.l];if(U.tok<L.cost)return;U.tok-=L.cost;U.tour={lvl:+b.dataset.l,round:0};utSave();utShow()});
+}
+const STK=['three','mid','dunk','def','steal','spd','block','drib','pass','reb'];
+const chemP=(p,b)=>{const q={...p};for(const k of STK)q[k]=Math.min(99,q[k]+b);return q};
+function chem(n,list){const st=(list||U.squad).slice(0,n).map(x=>ROSTER[IDX[x]]);return st.map((p,i)=>Math.min(4,st.filter((q,j)=>j!=i&&q.tm==p.tm).length))}
+const PACKS=[
+ {id:'std',name:'Sobre estándar',cost:1,n:3,w:[.70,.24,.054,.006],d:'3 jugadores aleatorios.'},
+ {id:'pre',name:'Sobre premium',cost:3,n:3,w:[.45,.42,.12,.01],g:1,d:'3 jugadores con un Oro asegurado (8 % de que sea Élite) y mejores opciones en los otros dos.'},
+ {id:'tm',name:'Sobre de equipo',cost:2,n:3,w:[.66,.27,.06,.01],f:'team',d:'Al abrirlo se elige un equipo al azar: 3 jugadores de ese equipo.'},
+ {id:'ps',name:'Sobre de posición',cost:2,n:3,w:[.66,.27,.06,.01],f:'pos',d:'Al abrirlo se elige una posición al azar: 3 jugadores de esa posición.'},
+ {id:'mega',name:'Mega sobre',cost:10,n:30,w:[.55,.335,.10,.015],d:'30 jugadores, con algo más de calidad que 10 sobres estándar.'},
+ {id:'leg',name:'Sobre de leyendas',cost:600,n:1,w:[0,0,0,0],leg:1,d:'1 leyenda de la historia al azar (las mejores son mucho más raras).'},
+ {id:'leg2',name:'Sobre doble de leyendas',cost:1000,n:2,w:[0,0,0,0],leg:1,d:'2 leyendas distintas de la historia al azar (las mejores son mucho más raras).'}
+];
+let shopSel={tm:'ATL',pos:'PG'},lastTag='';
+const pc=x=>(x*100).toFixed(1).replace('.',',').replace(',0','')+' %';
+const pickTier=w=>{const r=Math.random();let a=0;for(let i=0;i<w.length;i++){a+=w[i];if(r<a)return i}return 0};
+function openPack(id,free){
+  const pk=PACKS.find(x=>x.id==id);if(!pk||(pk.leg&&!ROSTER.some(p=>p.leg))||(free?!(U.free[id]>0):U.tok<pk.cost))return;if(free)U.free[id]--;else U.tok-=pk.cost;
+  const rt=rnd(Object.keys(TEAMS)),rp=rnd(['PG','SG','SF','PF','C']);lastTag=pk.f=='team'?'Equipo: '+TEAMS[rt][0]:pk.f=='pos'?'Posición: '+rp:'';
+  const flt=pk.f=='team'?p=>p.tm==rt:pk.f=='pos'?p=>p.pos==rp:()=>true,out=[];
+  for(let k=0;k<pk.n;k++){
+    const t=(pk.g&&k==0)?(Math.random()<.92?2:3):pickTier(pk.w);let c=[];
+    if(pk.leg)c=ROSTER.filter(p=>p.leg&&!out.some(o=>o.p===p));else for(const tt of [t,...[0,1,2,3].filter(x=>x!=t).sort((a,b)=>Math.abs(a-t)-Math.abs(b-t))]){c=ROSTER.filter(p=>tierOf(p)==tt&&flt(p));if(c.length)break}
+    const p=pk.leg?rndW(c,x=>Math.pow(100-x.ovr,1.3)):rnd(c),dup=U.coll.includes(p.name);
+    if(dup)U.dups.push(p.name);else U.coll.push(p.name);
+    out.push({p,dup});
+  }
+  out.sort((a,b)=>b.p.ovr-a.p.ovr);lastPack=out;utSave();$('utTok').textContent='Fichas: '+U.tok;reveal([...out].reverse());
+}
+function vShop(){
+  const sel2=(id,opts,cur)=>`<select id="${id}" style="${INP}">${opts.map(([v,l])=>`<option value="${v}" ${cur==v?'selected':''}>${l}</option>`).join('')}</select>`;
+  $('utBody').innerHTML='<p class="sub">Los sobres pueden dar repetidos, que van al mazo de repetidos de “Mi equipo”.</p>'+PACKS.map(k=>`<div class="oc"><div><b>${k.name}</b><small>${k.d}${k.leg?'':` Por jugador: Bronce ${pc(k.w[0])} · Plata ${pc(k.w[1])} · Oro ${pc(k.w[2])} · Élite ${pc(k.w[3])}`}</small></div><span>${k.cost} ficha${k.cost>1?'s':''}</span><button data-k="${k.id}" ${U.tok<k.cost||(k.leg&&!ROSTER.some(p=>p.leg))?'disabled':''}>Abrir</button>${U.free[k.id]>0?`<button data-k="${k.id}" data-f="1">Abrir gratis (${U.free[k.id]})</button>`:''}</div>`).join('')+
+  (lastPack?`<h2>Tu último sobre${lastTag?' · '+lastTag:''}</h2><div class="cards">${lastPack.map(cardHtml).join('')}</div>`:'');
+  $('utBody').querySelectorAll('button[data-k]').forEach(b=>b.onclick=()=>openPack(b.dataset.k,!!b.dataset.f));
+  if($('pkT'))$('pkT').onchange=e=>{shopSel.tm=e.target.value};if($('pkP'))$('pkP').onchange=e=>{shopSel.pos=e.target.value};
+}
+async function bkPack(o){
+  const j=JSON.stringify(o);let b,tag='P';
+  try{b=new Uint8Array(await new Response(new Blob([j]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer());tag='G'}catch(e){b=new TextEncoder().encode(j)}
+  let bin='';b.forEach(x=>bin+=String.fromCharCode(x));const t=tag+btoa(bin);return 'ZV1-'+t+'-'+csum(t);
+}
+async function bkUnpack(c){
+  const m=/^ZV1-([A-Za-z0-9+/=]+)-([a-z0-9]+)$/.exec(c.trim());if(!m||csum(m[1])!=m[2])return null;
+  try{const b=Uint8Array.from(atob(m[1].slice(1)),x=>x.charCodeAt(0));
+    const txt=m[1][0]=='G'?await new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('gzip'))).text():new TextDecoder().decode(b);
+    return JSON.parse(txt)}catch(e){return null}
+}
+function bkClean(u){
+  const ok=n=>typeof n=='string'&&n in IDX;
+  if(!u||!Array.isArray(u.coll)||!Array.isArray(u.squad))return null;
+  u.coll=[...new Set(u.coll.filter(ok))];
+  if(u.squad.length!=8||u.squad.some(n=>!ok(n)||!u.coll.includes(n)))return null;
+  u.dups=(u.dups||[]).filter(ok);u.used=(u.used||[]).filter(x=>typeof x=='string');u.out=(u.out||[]).filter(x=>x&&ok(x.n));
+  u.tok=Math.max(0,+u.tok||0);u.div=Math.min(10,Math.max(1,+u.div||10));u.played=Math.min(9,Math.max(0,+u.played||0));u.wins=Math.max(0,Math.min(u.played,+u.wins||0));u.fmt=[1,2,3,5].includes(+u.fmt)?+u.fmt:5;
+  u.id=typeof u.id=='string'&&u.id.length==6?u.id:newId();
+  u.up=Object.fromEntries(Object.entries(u.up||{}).filter(([k,v])=>ok(k)&&v>0).map(([k,v])=>[k,Math.min(MAXUP,Math.floor(+v)||0)]));
+  u.tour=(u.tour&&TOUR[u.tour.lvl]&&u.tour.round>=0&&u.tour.round<4)?{lvl:+u.tour.lvl,round:+u.tour.round}:null;
+  u.free=Object.fromEntries(Object.entries(u.free||{}).filter(([k,v])=>PACKS.some(p=>p.id==k)&&v>0).map(([k,v])=>[k,Math.floor(+v)]));
+  const sv=u.surv;u.surv=(sv&&[1,2,3,5].includes(+sv.n))?{n:+sv.n,round:Math.max(0,+sv.round||0),wins:Math.max(0,+sv.wins||0),used:(sv.used||[]).filter(ok),pick:(sv.pick||[]).filter(ok)}:null;u.survMsg=typeof u.survMsg=='string'?u.survMsg.slice(0,200):'';
+  u.duelDone=(u.duelDone||[]).filter(x=>typeof x=='string').slice(-200);u.duel=(u.duel&&typeof u.duel.id=='string'&&Array.isArray(u.duel.opp)&&Array.isArray(u.duel.res))?u.duel:null;
+  u.objs=(Array.isArray(u.objs)?u.objs:[]).filter(o=>o&&OBJK[o.kind]&&(!OBJK[o.kind].team||(o.team in TEAMS))).slice(0,4);
+  return u;
+}
+const csum=t=>{let h=0;for(const ch of t)h=(h*31+ch.charCodeAt(0))%99991;return h.toString(36)};
+const enc=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o))));
+const dec=t=>JSON.parse(decodeURIComponent(escape(atob(t))));
+function mkCode(n,to){const k=Math.random().toString(36).slice(2,8),t=enc([n,k,to]);return{k,code:'CB1-'+t+'-'+csum(t)}}
+function readCode(c){const m=/^CB1-([A-Za-z0-9+/=]+)-([a-z0-9]+)$/.exec(c);if(!m||csum(m[1])!=m[2])return null;try{const [n,k,to]=dec(m[1]);return n in IDX&&to?{n,k,to}:null}catch(e){return null}}
+const mkRcpt=k=>{const t=enc([k]);return 'RC1-'+t+'-'+csum(t)};
+function readRcpt(c){const m=/^RC1-([A-Za-z0-9+/=]+)-([a-z0-9]+)$/.exec(c);if(!m||csum(m[1])!=m[2])return null;try{return dec(m[1])[0]}catch(e){return null}}
+let gArm=-1;
+function dupList(){
+  gArm=-1;
+  $('dl').innerHTML=U.dups.length?U.dups.map((n,i)=>{const p=ROSTER[IDX[n]];return `<div class="oc"><div><b>${p.name}</b><small>${p.team} · ${p.pos} · ${p.ovr}</small></div><button data-d="${i}" data-a="g">Regalar</button><button data-d="${i}" data-a="x">Descartar</button></div>`}).join(''):'<p class="sub">No tienes repetidos.</p>';
+  $('dl').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.d,n=U.dups[i];
+    if(b.dataset.a=='x'){U.dups.splice(i,1);utSave();vTeam();return}
+    const to=($('gid').value||'').trim().toUpperCase();
+    if(to.length!=6||to==U.id){$('cmsg').textContent='Escribe el ID de 6 caracteres de tu amigo (no el tuyo) antes de regalar.';return}
+    if(gArm!==i){gArm=i;b.textContent='¿Seguro? No se puede cancelar';return}
+    const {k,code}=mkCode(n,to);U.dups.splice(i,1);U.out.push({n,k,to,code});utSave();vTeam();
+    $('cmsg').textContent='Regalo creado (ya no se puede cancelar): copia el código desde “En envío” y mándaselo a tu amigo.';
+  });
+  $('ol').innerHTML=U.out.length?U.out.map((o,i)=>`<div class="oc"><div><b>${o.n}</b><small>Para el ID ${o.to}</small><textarea readonly rows="2" style="width:100%;${INP}">${o.code}</textarea></div></div>`).join(''):'<p class="sub">No tienes envíos pendientes.</p>';
+}
+const SLOTN=['Titular 1','Titular 2','Titular 3','Titular 4','Titular 5','Banquillo 1','Banquillo 2','Banquillo 3'];
+function vTeam(){
+  const avg=Math.round(U.squad.slice(0,5).reduce((a,n)=>a+effOvr(ROSTER[IDX[n]]),0)/5);
+  $('utBody').innerHTML=`<h2>Plantilla <small style="font-size:16px;color:var(--mut)">· titulares ${avg} de media · ${U.coll.length} jugadores</small></h2><p class="sub" id="tmsg">Toca un hueco y luego un jugador de tu colección (o dos huecos para intercambiarlos). La química (Quím.) suma a todas las estadísticas de los titulares: +1 por cada compañero titular del mismo equipo, hasta +4.</p>
+  <div class="row"><button id="bestL">Alinear mejor plantilla</button></div><p class="sub">${shapeOk(U.squad.slice(0,5))?'Alineación válida para 5v5.':SHAPE_MSG}</p>
+  <div class="slots">${U.squad.map((n,i)=>{const p=ROSTER[IDX[n]];return `<button class="sl t${tierOf(p)} ${slotSel===i?'on':''}" data-s="${i}"><small>${SLOTN[i]}</small><b>${p.name}</b><span>${p.pos} · ${effOvr(p)}${lvl(p.name)?' ↑'+lvl(p.name):''}${i<5?` · Quím. +${chem(5)[i]}`:''}</span></button>`}).join('')}</div>
+  <div class="row" style="margin-top:14px"><button id="collBtn">${utF.showColl?'Ocultar':'Mostrar'} colección (${U.coll.length})</button></div>
+  <div id="collBox" style="${utF.showColl?'':'display:none'}"><div class="row"><input id="tq" type="search" placeholder="Buscar" value="${utF.q}" style="background:var(--card);color:var(--fg);border:2px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit"><select id="tpos" style="background:var(--card);color:var(--fg);border:2px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit"><option value="">Todas</option>${['PG','SG','SF','PF','C'].map(x=>`<option ${utF.pos==x?'selected':''}>${x}</option>`).join('')}</select></div>
+  <div id="tl"></div></div>
+  <h2>Mejorar cartas</h2><p class="sub">Gasta copias repetidas de un mismo jugador para subirle +1 de media por nivel (máximo +8). Cuanto mejor es la carta, más copias cuesta: 1 hasta media 72, 2 hasta 79, 3 hasta 86, 4 hasta 93 y 5 desde 94.</p><div id="ul"></div>
+  <h2>Mi ID de amigo: ${U.id}</h2><p class="sub">Dáselo a quien quiera regalarte un jugador: su código solo funcionará con tu ID.</p>
+  <h2>Repetidos (${U.dups.length})</h2><div class="row"><input id="gid" placeholder="ID de tu amigo para regalar" maxlength="6" value="${utF.gid||''}" style="${INP}"></div><div id="dl"></div>
+  <h2>En envío (${U.out.length})</h2><p class="sub">Un regalo no se puede cancelar: el jugador queda reservado para tu amigo y desaparece de tu colección para siempre cuando él te devuelve el recibo. Si se pierde el código, puedes copiarlo de nuevo desde aquí.</p><div id="ol"></div>
+  <h2>Canjear código o recibo</h2><div class="row"><input id="cin" placeholder="Pega un código de regalo o un recibo" style="flex:1;min-width:200px;${INP}"><button id="cgo">Canjear</button></div><p class="sub" id="cmsg"></p>
+  <h2>Copia de seguridad</h2><p class="sub">Exporta tu partida como un código de texto para guardarla o pasarla a otro dispositivo. Importar sustituye la partida actual.</p>
+  <div class="row"><button id="bkEx">Exportar partida</button></div><textarea id="bkOut" readonly rows="3" style="display:none;width:100%;${INP}"></textarea>
+  <div class="row"><input id="bkIn" placeholder="Pega aquí un código de copia" style="flex:1;min-width:200px;${INP}"><button id="bkImp">Importar</button></div><p class="sub" id="bkMsg"></p>
+  <div class="row"><button id="utReset">Reiniciar Ultimate Team</button></div>`;
+  $('utBody').querySelectorAll('.sl').forEach(b=>b.onclick=()=>{const i=+b.dataset.s;
+    if(slotSel!=null&&slotSel!==i){[U.squad[i],U.squad[slotSel]]=[U.squad[slotSel],U.squad[i]];slotSel=null;utSave();vTeam()}else{slotSel=slotSel===i?null:i;if(slotSel!=null)utF.showColl=true;vTeam()}});
+  $('tq').oninput=e=>{utF.q=e.target.value;teamList()};$('tpos').onchange=e=>{utF.pos=e.target.value;teamList()};
+  $('utReset').onclick=()=>{if(!armed){armed=true;$('utReset').textContent='¿Seguro? Se borra todo. Pulsa otra vez';return}armed=false;U=null;lastPack=null;utTab='obj';localStorage.removeItem('cb_ut');utShow()};
+  $('collBtn').onclick=()=>{utF.showColl=!utF.showColl;vTeam()};
+  $('bestL').onclick=()=>{const ok=bestLineup();slotSel=null;utSave();vTeam();const c=chem(5);$('tmsg').textContent=ok?`Plantilla alineada: titulares con ${Math.round(U.squad.slice(0,5).reduce((a,n)=>a+effOvr(ROSTER[IDX[n]]),0)/5)} de media y química media +${(c.reduce((a,b)=>a+b,0)/5).toFixed(1)}.`:'No tienes jugadores suficientes para una alineación válida; he puesto a los mejores. '+SHAPE_MSG};
+  $('gid').oninput=e=>{utF.gid=e.target.value};
+  $('bkEx').onclick=async()=>{const o=$('bkOut');o.value=await bkPack({v:1,u:U});o.style.display='block';o.select();$('bkMsg').textContent='Copia este código y guárdalo en un sitio seguro.'};
+  $('bkImp').onclick=async()=>{
+    const m=$('bkMsg'),v=$('bkIn').value;if(!v.trim()){m.textContent='Pega primero un código.';return}
+    const o=await bkUnpack(v),u=o&&bkClean(o.u);
+    if(!u){m.textContent='Código no válido o dañado.';return}
+    if(!armed){armed=true;m.textContent='Esto sustituirá tu partida actual. Pulsa Importar otra vez para confirmar.';return}
+    armed=false;U=u;while(U.objs.length<4)U.objs.push(newObj());utSave();lastPack=null;slotSel=null;utTab='obj';utShow();
+  };
+  $('cgo').onclick=()=>{
+    const v=$('cin').value.trim(),m=$('cmsg');
+    if(v.startsWith('RC1-')){
+      const k=readRcpt(v),j=k?U.out.findIndex(o=>o.k==k):-1;
+      if(j<0){m.textContent='Recibo no válido o ya confirmado.';return}
+      const n=U.out[j].n;U.out.splice(j,1);utSave();vTeam();
+      $('cmsg').textContent=`Envío confirmado: ${n} ya es de tu amigo y sale de tu colección para siempre.`;return}
+    const r=readCode(v);
+    if(!r){m.textContent='Código no válido.';return}
+    if(r.to!=U.id){m.textContent='Este código es para otro jugador (otro ID).';return}
+    if(U.used.includes(r.k)){m.textContent='Este código ya se canjeó.';return}
+    U.used.push(r.k);if(U.coll.includes(r.n))U.dups.push(r.n);else U.coll.push(r.n);utSave();vTeam();
+    $('cmsg').innerHTML=`¡Has recibido a ${r.n}! Devuelve este recibo a quien te lo regaló para completar el envío:<br><textarea readonly rows="2" style="width:100%;${INP}">${mkRcpt(r.k)}</textarea>`;
+  };
+  teamList();dupList();upList();
+}
+function bestLineup(){
+  const all=U.coll.map(n=>ROSTER[IDX[n]]).sort((a,b)=>effOvr(b)-effOvr(a));
+  let best=bestFive(all);const ok=!!best;if(!best)best=all.slice(0,5);
+  const rest=all.filter(p=>!best.includes(p)).slice(0,3);
+  U.squad=[...best.sort((a,b)=>effOvr(b)-effOvr(a)),...rest].map(p=>p.name);return ok;
+}
+function teamList(){
+  const q=norm(utF.q.trim());
+  const a=U.coll.map(n=>ROSTER[IDX[n]]).filter(p=>(!q||norm(p.name).includes(q)||norm(p.team).includes(q))&&(!utF.pos||p.pos==utF.pos)).sort((x,y)=>y.ovr-x.ovr);
+  $('tl').innerHTML=a.map(p=>`<button class="pl t${tierOf(p)}" data-n="${p.name}" aria-pressed="${U.squad.includes(p.name)}"><span class="dot" style="background:${p.col}">${p.pos}</span><span class="nm"><b>${p.name}</b><small>${p.team} · ${p.pos}</small></span><span class="ov">${effOvr(p)}${lvl(p.name)?' ↑'+lvl(p.name):''}</span><span class="ch">${LBL.map(([k,l])=>`<i>${l.slice(0,3)} <b>${p[k]}</b></i>`).join('')}</span></button>`).join('');
+  $('tl').querySelectorAll('.pl').forEach(b=>b.onclick=()=>{
+    if(slotSel==null){$('tmsg').textContent='Primero toca un hueco de la plantilla.';return}
+    const nm=b.dataset.n,j=U.squad.indexOf(nm),old=U.squad[slotSel];
+    if(j>=0)U.squad[j]=old;U.squad[slotSel]=nm;slotSel=null;utF.showColl=false;utSave();vTeam();
+  });
+}
+$('hQ').onclick=()=>{$('home').style.display='none';$('menu').style.display='block'};
+$('hU').onclick=utShow;$('mHome').onclick=goHome;$('utHome').onclick=goHome;
+$('utTabs').querySelectorAll('button[data-t]').forEach(b=>b.onclick=()=>{utTab=b.dataset.t;armed=false;utShow()});
+// ---- Mando ----
+let padPrev=[],padV={x:0,y:0};
+function padPoll(){
+  const g=navigator.getGamepads?[...navigator.getGamepads()].find(Boolean):null;
+  if(!g||!G){padV={x:0,y:0};padPrev=[];return}
+  const b=g.buttons.map(x=>x.pressed),dn=i=>b[i]&&!padPrev[i],up=i=>!b[i]&&padPrev[i];
+  let x=g.axes[0]||0,y=g.axes[1]||0;if(Math.hypot(x,y)<.25){x=0;y=0}
+  x+=(b[15]?1:0)-(b[14]?1:0);y+=(b[13]?1:0)-(b[12]?1:0);
+  padV={x:clamp(x,-1,1),y:clamp(y,-1,1)};
+  if(dn(9)){if(G.subsOpen)closeSubs();else togglePause()}
+  if(G.subsOpen){if(dn(3))closeSubs()}
+  else if(!G.paused&&!G.over){
+    if(dn(0))actDown();if(up(0))actUp();
+    if(dn(1))actDrib();if(dn(2))passOrSwitch();if(dn(3))openSubs();
+  }
+  padPrev=b;
+}
+addEventListener('gamepadconnected',()=>{if(G)say('Mando conectado')});
+// ---- Duelos con apuesta ----
+const DU_LV=[{n:'Fácil',t:.2},{n:'Medio',t:.55},{n:'Difícil',t:.9}];
+function duelOpp(n,t){
+  const target=60+31.5*t,need=n+BENCHN[n],cand=ROSTER.filter(p=>!p.leg),res=[];
+  for(let r=0;r<5;r++){
+    const used=new Set(res.flat());
+    res.push(cand.filter(p=>!used.has(p.name)).map(p=>[p,Math.abs(p.ovr-target)+Math.random()*10]).sort((a,b)=>a[1]-b[1]).slice(0,need).map(x=>x[0].name));
+  }
+  return res;
+}
+function duelCode(D){const t=enc({id:D.id,s:D.stake,n:D.n,t:D.t,o:D.opp});return 'DU1-'+t+'-'+csum(t)}
+function readDuel(c){
+  const m=/^DU1-([A-Za-z0-9+/=]+)-([a-z0-9]+)$/.exec(c.trim());if(!m||csum(m[1])!=m[2])return null;
+  try{const o=dec(m[1]);
+    if(!o.id||!(o.s>=1)||![1,2,3,5].includes(o.n)||!Array.isArray(o.o)||o.o.length!=5||o.o.some(a=>!Array.isArray(a)||a.length<o.n||a.some(x=>!(x in IDX))))return null;
+    return{id:String(o.id),stake:Math.floor(o.s),n:o.n,t:Math.min(1,Math.max(0,+o.t||0)),opp:o.o};
+  }catch(e){return null}
+}
+const duelTot=D=>({w:D.res.filter(r=>r.w).length,d:D.res.reduce((a,r)=>a+r.d,0)});
+function duelResCode(){const D=U.duel,r=duelTot(D),t=enc({id:D.id,r:D.role,w:r.w,d:r.d});return 'DR1-'+t+'-'+csum(t)}
+function readRes(c){
+  const m=/^DR1-([A-Za-z0-9+/=]+)-([a-z0-9]+)$/.exec(c.trim());if(!m||csum(m[1])!=m[2])return null;
+  try{const o=dec(m[1]);return(typeof o.id=='string'&&(o.r=='A'||o.r=='B')&&Number.isFinite(o.w)&&Number.isFinite(o.d))?o:null}catch(e){return null}
+}
+function duelEnd(w,ab){
+  const D=U.duel,win=w==0&&!ab;if(!ab)utObjProg(w==0);
+  D.res.push({w:win,d:ab?-TARGET:G.s[0]-G.s[1]});
+  const k=D.res.length,t=duelTot(D);
+  let msg=`Partido ${k}/5 del duelo: ${win?'victoria':'derrota'} (${G.s[0]}-${G.s[1]}). Llevas ${t.w} victorias y diferencia ${t.d>0?'+':''}${t.d}.`;
+  if(k==5)msg+=' Duelo terminado: ve a Duelos para compartir tu resultado y comparar.';if(k==5&&D.cloud)duelUpload();
+  utSave();if(!ab)$('es').innerHTML+=`<p>${msg}</p>`;
+}
+function duelSettle(code){
+  const D=U.duel,o=readRes(code);
+  if(!o)return 'Código de resultado no válido.';
+  if(o.id!=D.id)return 'Ese resultado es de otro duelo.';
+  if(o.r==D.role)return 'Ese es tu propio resultado: necesitas el de tu amigo.';
+  const me=duelTot(D),c=me.w!=o.w?Math.sign(me.w-o.w):Math.sign(me.d-o.d),cmp=`${me.w}-${o.w} en victorias, diferencia ${me.d} contra ${o.d}`;
+  let msg;
+  if(c>0){U.tok+=2*D.stake;msg=`¡Has ganado el duelo! (${cmp}). +${2*D.stake} fichas.`}
+  else if(c<0)msg=`Has perdido el duelo (${cmp}). Tu apuesta de ${D.stake} fichas se la lleva tu amigo.`;
+  else{U.tok+=D.stake;msg=`Empate total (${cmp}): se te devuelven ${D.stake} fichas.`}
+  U.duelDone.push(D.id);U.duel=null;U.duelMsg=msg;utSave();return null;
+}
+let duArm=null;
+// ---- Duelos con resultados guardados (Firebase Realtime Database por REST) ----
+const fbU=()=>(FB_URL||CFG.fb||'').trim().replace(/\/+$/,'');
+async function fb(method,path,body){
+  const o={method};if(body!=null)o.body=JSON.stringify(body);
+  const r=await fetch(fbU()+'/zv/'+path+'.json',o);if(!r.ok)throw new Error('http '+r.status);return r.json();
+}
+function cleanDuel(o,id){
+  if(!o||!(o.stake>=1)||![1,2,3,5].includes(o.n)||!Array.isArray(o.opp)||o.opp.length!=5||o.opp.some(a=>!Array.isArray(a)||a.length<o.n||a.some(x=>!(x in IDX))))return null;
+  return{id,stake:Math.floor(o.stake),n:o.n,t:Math.min(1,Math.max(0,+o.t||0)),opp:o.opp};
+}
+function duelUpload(){
+  const D=U.duel,r=duelTot(D);
+  fb('PUT',`duels/${D.id}/res/${D.role}`,{w:r.w,d:r.d,t:Date.now()}).then(()=>{D.sent=true;utSave()}).catch(()=>{});
+}
+function duelSettleO(o){
+  const D=U.duel,me=duelTot(D),c=me.w!=o.w?Math.sign(me.w-o.w):Math.sign(me.d-o.d),cmp=`${me.w}-${o.w} en victorias, diferencia ${me.d} contra ${o.d}`;
+  let msg;
+  if(c>0){U.tok+=2*D.stake;msg=`¡Has ganado el duelo! (${cmp}). +${2*D.stake} fichas.`}
+  else if(c<0)msg=`Has perdido el duelo (${cmp}). Tu apuesta de ${D.stake} fichas se la lleva tu amigo.`;
+  else{U.tok+=D.stake;msg=`Empate total (${cmp}): se te devuelven ${D.stake} fichas.`}
+  U.duelDone.push(D.id);U.duel=null;U.duelMsg=msg;utSave();
+}
+async function duelCheck(){
+  const D=U.duel;if(!D||!D.cloud)return;const m=$('duMsg');
+  try{
+    const doc=await fb('GET','duels/'+D.id);
+    if(!U.duel||U.duel!==D)return;
+    if(!doc){if(m)m.textContent='El duelo ya no existe en el servidor.';return}
+    D.joined=!!doc.B;D.bt=doc.B&&doc.B.t||0;
+    if(D.res.length==5&&!D.sent)duelUpload();
+    const other=doc.res&&doc.res[D.role=='A'?'B':'A'];
+    if(D.res.length==5&&other&&Number.isFinite(other.w)&&Number.isFinite(other.d)){duelSettleO(other);utShow();return}
+    if(m){
+      m.textContent=D.res.length<5?(D.joined?'Tu amigo ya está dentro del duelo.':'Aún no se ha unido tu amigo.'):'Esperando el resultado de tu amigo…';
+      const cl=$('duClaim');if(cl)cl.style.display=(D.res.length==5&&D.joined&&Date.now()-D.bt>864e5&&!other)?'inline-block':'none';
+    }
+  }catch(e){if(m)m.textContent='No se pudo conectar con el servidor de duelos.'}
+}
+function vDuel(){
+  const B=$('utBody'),D=U.duel,bad5=n=>n==5&&!shapeOk(U.squad.slice(0,5)),cloud=!!fbU();
+  if(!D){
+    const fm=U.duelFmt||3,lv=U.duelLv==null?1:U.duelLv,st=U.duelStake||5;
+    B.innerHTML=`<p class="sub">Apuesta fichas con un amigo: cada uno juega 5 partidos contra los mismos 5 equipos de la máquina, con su propia plantilla. Gana quien consiga más victorias y, si empatáis, quien tenga mejor diferencia de puntos. El ganador se lleva las dos apuestas y, si empatáis del todo, se devuelven. ${cloud?'Los resultados se guardan en el servidor de duelos y se resuelven solos.':'Sin servidor de duelos configurado, todo se intercambia con códigos de texto (duelo de confianza).'}</p>
+    ${U.duelMsg?`<p><b>${U.duelMsg}</b></p>`:''}
+    <h2>Crear un reto</h2><div class="row"><input id="duStake" type="number" min="1" max="1000" value="${st}" style="${INP};width:110px"><span>fichas por jugador</span></div>
+    <div class="row" id="duF">${[1,2,3,5].map(k=>`<button data-n="${k}" aria-pressed="${fm==k}">${k}v${k}</button>`).join('')}</div>
+    <div class="row" id="duL">${DU_LV.map((l,i)=>`<button data-l="${i}" aria-pressed="${lv==i}">${l.n}</button>`).join('')}</div>
+    <button class="go" id="duMk">Crear reto y pagar la apuesta</button>
+    <h2>Aceptar un reto</h2><textarea id="duIn" rows="2" placeholder="${cloud?'ID del duelo (o código largo)':'Pega aquí el código del reto'}" style="${INP};width:100%"></textarea><div class="row"><button class="go" id="duAcc">Aceptar reto</button></div><p class="sub" id="duMsg"></p>
+    <h2>Servidor de duelos</h2><p class="sub">${FB_URL?'Configurado en el juego.':'Opcional: pega la URL de tu Firebase Realtime Database para guardar los resultados (ver instrucciones). Debe ser la misma para los dos jugadores.'}</p>
+    ${FB_URL?'':`<div class="row"><input id="fbIn" placeholder="https://tu-proyecto-default-rtdb.firebaseio.com" value="${CFG.fb||''}" style="flex:1;min-width:220px;${INP}"><button id="fbSave">Guardar</button></div>`}`;
+    $('duF').querySelectorAll('button').forEach(b=>b.onclick=()=>{U.duelFmt=+b.dataset.n;U.duelStake=+$('duStake').value||5;utSave();vDuel()});
+    $('duL').querySelectorAll('button').forEach(b=>b.onclick=()=>{U.duelLv=+b.dataset.l;U.duelStake=+$('duStake').value||5;utSave();vDuel()});
+    if($('fbSave'))$('fbSave').onclick=()=>{CFG.fb=$('fbIn').value.trim();save();vDuel()};
+    $('duMk').onclick=async()=>{
+      const stake=Math.floor(+$('duStake').value),m=$('duMsg');
+      if(!(stake>=1&&stake<=1000)){m.textContent='La apuesta debe estar entre 1 y 1000 fichas.';return}
+      if(U.tok<stake){m.textContent=`No tienes ${stake} fichas.`;return}
+      const t=DU_LV[lv].t,opp=duelOpp(fm,t);
+      let D2;
+      if(cloud){
+        const id=(newId()+newId()).slice(0,8);D2={id,role:'A',stake,n:fm,t,opp,res:[],cloud:true,code:id};
+        try{await fb('PUT','duels/'+id,{stake,n:fm,t,opp,createdAt:Date.now(),A:{t:Date.now()}})}catch(e){m.textContent='No se pudo conectar con el servidor de duelos.';return}
+      }else{D2={id:newId()+newId(),role:'A',stake,n:fm,t,opp,res:[]};D2.code=duelCode(D2)}
+      U.tok-=stake;U.duel=D2;U.duelMsg='';U.duelStake=stake;utSave();utShow();
+    };
+    $('duAcc').onclick=async()=>{
+      const raw=$('duIn').value.trim(),m=$('duMsg');
+      let o=null,cl=false;
+      if(/^DU1-/.test(raw))o=readDuel(raw);
+      else if(raw&&cloud){
+        const id=raw.toUpperCase();
+        if(!/^[A-Z0-9]{8}$/.test(id)){m.textContent='ID de duelo no válido.';return}
+        try{const doc=await fb('GET','duels/'+id);
+          if(!doc){m.textContent='No existe ese duelo.';return}
+          if(doc.B){m.textContent='Ese duelo ya tiene rival.';return}
+          o=cleanDuel(doc,id);cl=true}catch(e){m.textContent='No se pudo conectar con el servidor de duelos.';return}
+      }
+      if(!o){m.textContent='Código o ID de reto no válido.';return}
+      if(U.duelDone.includes(o.id)){m.textContent='Ya has jugado este reto.';return}
+      if(U.tok<o.stake){m.textContent=`Necesitas ${o.stake} fichas para aceptar (tienes ${U.tok}).`;return}
+      if(duArm!==o.id){duArm=o.id;m.textContent=`Reto de ${o.stake} fichas, ${o.n}v${o.n}, 5 partidos. Pulsa otra vez Aceptar reto para pagar y empezar.`;return}
+      duArm=null;
+      if(cl){
+        const nonce=newId();
+        try{await fb('PUT',`duels/${o.id}/B`,{t:Date.now(),nonce});const chk=await fb('GET',`duels/${o.id}/B`);
+          if(!chk||chk.nonce!==nonce){m.textContent='Otro jugador se ha unido antes que tú.';return}}
+        catch(e){m.textContent='No se pudo conectar con el servidor de duelos.';return}
+      }
+      U.tok-=o.stake;U.duel={...o,role:'B',res:[],cloud:cl,joined:true,bt:Date.now()};U.duelMsg='';utSave();utShow();
+    };
+    return;
+  }
+  const k=D.res.length,L=DU_LV.find(l=>l.t==D.t)||{n:'Personalizado'},me=duelTot(D);
+  B.innerHTML=`<h2>Duelo ${D.n}v${D.n} · ${D.stake} fichas · ${L.n}</h2><p>Partidos: ${k}/5 · Victorias: ${me.w} · Diferencia: ${me.d>0?'+':''}${me.d}</p>
+  <p class="sub">${D.res.map((r,i)=>`${i+1}: ${r.w?'V':'D'} (${r.d>0?'+':''}${r.d})`).join(' · ')||'Aún no has jugado.'}</p>
+  ${D.role=='A'?(D.cloud?`<p>ID del duelo (dáselo a tu amigo): <b style="font-size:26px;letter-spacing:2px">${D.code}</b></p>`:`<p class="sub">Código del reto (envíaselo a tu amigo):</p><textarea readonly rows="3" style="${INP};width:100%">${D.code}</textarea>`):''}
+  ${k<5?`${bad5(D.n)?`<p class="sub">${SHAPE_MSG}</p>`:''}<button class="go" id="duPlay" ${bad5(D.n)?'disabled':''}>Jugar partido ${k+1}/5</button>${k==0&&D.role=='A'?'<div class="row"><button id="duCancel">Cancelar reto (te devuelven la apuesta)</button></div>':''}`:
+  (D.cloud?`<p class="sub">Tu resultado ya está guardado en el servidor. Cuando tu amigo termine, el duelo se resuelve solo.</p><div class="row"><button id="duRef">Actualizar</button><button id="duClaim" style="display:none">Reclamar victoria por abandono (24 h)</button></div>`:
+  `<p class="sub">Tu resultado (envíaselo a tu amigo):</p><textarea readonly rows="2" style="${INP};width:100%">${duelResCode()}</textarea>
+  <h2>Resultado de tu amigo</h2><div class="row"><input id="duRes" placeholder="Pega aquí su resultado" style="flex:1;min-width:200px;${INP}"><button id="duCmp">Comparar y cobrar</button></div>`)}
+  <p class="sub" id="duMsg"></p>`;
+  if($('duPlay'))$('duPlay').onclick=()=>utPlay(false,false,true);
+  if($('duCancel'))$('duCancel').onclick=async()=>{
+    if(D.cloud){try{const doc=await fb('GET','duels/'+D.id);if(doc&&doc.B){$('duMsg').textContent='Tu amigo ya ha aceptado: no se puede cancelar.';return}await fb('DELETE','duels/'+D.id)}catch(e){$('duMsg').textContent='No se pudo conectar con el servidor de duelos.';return}}
+    U.tok+=D.stake;U.duel=null;U.duelMsg='Reto cancelado: apuesta devuelta.';utSave();utShow();
+  };
+  if($('duCmp'))$('duCmp').onclick=()=>{const e=duelSettle($('duRes').value);if(e)$('duMsg').textContent=e;else utShow()};
+  if($('duRef'))$('duRef').onclick=duelCheck;
+  if($('duClaim'))$('duClaim').onclick=()=>{U.tok+=2*D.stake;U.duelDone.push(D.id);U.duel=null;U.duelMsg=`Tu amigo no terminó en 24 horas: ganas el duelo por abandono. +${2*D.stake} fichas.`;utSave();utShow()};
+  if(D.cloud){duelCheck();duTimer=setInterval(duelCheck,5000)}
+}
+// ---- Partido online (PeerJS, el anfitrión simula y el invitado envía controles) ----
+const NETV='zv1';
+let onlFmt=3,onlMsg='';
+const cleanS=x=>String(x==null?'':x).replace(/[^\p{L}\p{N} .'()\-]/gu,'').slice(0,40);
+const cleanP=o=>{
+  if(!o||typeof o!='object')return null;
+  const p={name:cleanS(o.name)||'Jugador',tm:(o.tm in TEAMS)?o.tm:'CHI',team:cleanS(o.team),pos:['PG','SG','SF','PF','C'].includes(o.pos)?o.pos:'SF',num:Math.max(0,Math.min(99,Math.floor(+o.num)||0)),col:/^#[0-9a-fA-F]{6}$/.test(o.col)?o.col:'#888888',ovr:Math.max(40,Math.min(99,+o.ovr||70))};
+  for(const k of KK)p[k]=Math.max(20,Math.min(99,+o[k]||50));
+  if(o.leg)p.leg=1;return p;
+};
+const serP=p=>{const o={name:p.name,tm:p.tm,team:p.team,pos:p.pos,num:p.num,col:p.col,ovr:p.ovr};for(const k of KK)o[k]=p[k];if(p.leg)o.leg=1;return o};
+function onlineTeam(n){
+  let L;
+  if(U){
+    const sq=U.squad.slice(0,n);if(n==5&&!shapeOk(sq))return{err:SHAPE_MSG};
+    const cb=chem(n,U.squad);L=sq.map((nm,i)=>chemP(upP(ROSTER[IDX[nm]]),cb[i]));
+  }else{
+    if(sel.length<n)return{err:`Elige al menos ${n} jugadores en Partido rápido primero.`};
+    L=sel.slice(0,n).map(i=>ROSTER[i]);
+  }
+  return{team:L.map(serP)};
+}
+function netSend(m){try{if(NET&&NET.conn&&NET.conn.open)NET.conn.send(m)}catch(e){}}
+function netCleanup(){
+  const r=NET&&NET.restore;
+  try{NET&&NET.conn&&NET.conn.close()}catch(e){}
+  try{NET&&NET.peer&&NET.peer.destroy()}catch(e){}
+  NET=null;NETM=null;if(r){mode=r.mode;sel=r.sel}
+}
+function onlErr(t){onlMsg=t;netCleanup();$('game').style.display='none';G=null;$('onl').style.display='block';vOnl()}
+function netLeave(){netCleanup();G=null;NETM=null;$('game').style.display='none';goHome()}
+function onlShow(){$('home').style.display='none';$('onl').style.display='block';onlMsg='';vOnl()}
+function hostCreate(n,stake){
+  if(typeof Peer=='undefined')return;
+  const code=newId();NET={role:'host',n,stake,code,state:'wait',ev:[],snapT:0,sendT:0,restore:{mode,sel:[...sel]}};
+  const peer=new Peer('zv-'+code);NET.peer=peer;
+  peer.on('open',()=>vOnl());
+  peer.on('error',e=>onlErr('Error de conexión: '+(e.type||'desconocido')));
+  peer.on('connection',conn=>{
+    if(NET.conn){conn.on('open',()=>{conn.send({k:'full'});setTimeout(()=>conn.close(),300)});return}
+    NET.conn=conn;
+    conn.on('open',()=>{NET.state='conn';conn.send({k:'cfg',n:NET.n,stake:NET.stake,v:NETV});vOnl()});
+    conn.on('data',netMsg);conn.on('close',netClosed);
+  });
+  vOnl();
+}
+function guestJoin(code){
+  if(typeof Peer=='undefined')return;
+  NET={role:'guest',code,state:'joining',ev:[],snapT:0,sendT:0,dir:[0,0],restore:{mode,sel:[...sel]}};
+  const peer=new Peer();NET.peer=peer;
+  const to=setTimeout(()=>{if(NET&&NET.state=='joining')onlErr('No se pudo conectar. Revisa el código y tu conexión.')},15000);
+  peer.on('open',()=>{
+    const conn=peer.connect('zv-'+code,{serialization:'json',reliable:true});NET.conn=conn;
+    conn.on('open',()=>{clearTimeout(to);netSend({k:'hello',v:NETV});vOnl()});
+    conn.on('data',netMsg);conn.on('close',netClosed);conn.on('error',()=>onlErr('Error de conexión.'));
+  });
+  peer.on('error',e=>{clearTimeout(to);onlErr('Error de conexión: '+(e.type||'desconocido'))});
+  vOnl();
+}
+function netClosed(){if(NET)netRemoteLeft()}
+function netRemoteLeft(){
+  if(!NET)return;
+  if(G&&!G.over&&NET.state=='play'){
+    G.over=true;sfx('win');$('et').textContent='¡Victoria!';
+    let extra='';if(NET.stake>0&&U){U.tok+=2*NET.stake;utSave();extra=` Cobras ${2*NET.stake} fichas.`}
+    $('es').textContent='Tu rival se ha desconectado o ha abandonado.'+extra;$('end').style.display='flex';
+  }else if(!G||NET.state!='play'){onlErr('Tu amigo se ha desconectado.')}
+}
+function netForfeit(){
+  netSend({k:'bye'});
+  if(G&&!G.over){G.over=true;$('et').textContent='Derrota';$('es').textContent='Has abandonado la partida.';$('end').style.display='flex'}
+}
+function netSettle(w){
+  const my=NET.role=='host'?0:1;
+  if(NET.stake>0&&U){if(w==my){U.tok+=2*NET.stake;utSave();$('es').innerHTML+=`<p>Apuesta ganada: +${2*NET.stake} fichas.</p>`}else $('es').innerHTML+=`<p>Apuesta perdida: -${NET.stake} fichas.</p>`}
+}
+function netEnd(w){if(!NET||NET.role!='host')return;netSend({k:'end',w,s:G.s,st:P.map(o=>o.st)});netSettle(w)}
+function cleanSt(o){const r={};for(const k of ['pts','fg','fga','t3','stl','blk','reb','ast'])r[k]=Math.max(0,Math.min(999,Math.floor(+(o&&o[k])||0)));return r}
+function guestEnd(m){
+  if(!G||G.over)return;
+  G.over=true;G.s=[+m.s[0]||0,+m.s[1]||0];(m.st||[]).forEach((st,i)=>{if(P[i])P[i].st=cleanSt(st)});
+  const win=m.w==1;sfx(win?'win':'lose');$('et').textContent=win?'¡Victoria!':'Derrota';
+  $('es').innerHTML=`<div style="font-size:34px;font-family:Anton,sans-serif">${G.s[1]} – ${G.s[0]}</div><table><tr><th></th><th>PTS</th><th>TC</th><th>3P</th><th>ROB</th><th>TAP</th><th>REB</th><th>AST</th></tr>${box()}</table>`;
+  $('end').style.display='flex';netSettle(m.w);
+}
+// anfitrión
+function hostStart(c){
+  if(c.stake>0&&U){U.tok-=c.stake;utSave()}
+  NETM={t0:c.t0.map(cleanP),t1:c.t1.map(cleanP),n:c.n};
+  mode=c.n;UTM=null;$('onl').style.display='none';
+  start();
+  G.ctl1=P.findIndex(o=>o.t==1);NET.state='play';NET.snapT=0;RI={vx:0,vy:0};
+}
+let RI={vx:0,vy:0};
+function autoCtl1(){
+  if(!G||G.ctl1==null)return;
+  if(G.ball=='fly'||G.ball=='fight')return;
+  if(G.ball=='held'&&G.own.t==1){G.ctl1=P.indexOf(G.own);return}
+  if(G.ball=='pass'&&G.pass.to.t==1&&G.pass.from.t==1){G.ctl1=P.indexOf(G.pass.to);return}
+  const r=G.ball=='held'?G.own:G.ball=='pass'?G.pass.to:G.loose,cur=P[G.ctl1],b=nearest(T(1),r);
+  if(cur.t!=1||dist(b,r)<dist(cur,r)-25)G.ctl1=P.indexOf(b);
+}
+function netMove(dt){const g=P[G.ctl1];if(!g||NET.state!='play')return;move(g,g.x+RI.vx*100,g.y+RI.vy*100,dt,1);g.dir=[RI.vx,RI.vy]}
+function passFor(m,dx,dy){
+  if(G.ball!='held'||G.own!==m)return;const ms=mates(m);if(!ms.length)return;const l=Math.hypot(dx,dy);
+  const sc=q=>l>.1?((q.x-m.x)*dx+(q.y-m.y)*dy)/(Math.hypot(q.x-m.x,q.y-m.y)||1)/l:-dist(q,m)/100;
+  pass(m,ms.reduce((a,c)=>sc(a)>sc(c)?a:c));
+}
+function snap(){
+  const idx=o=>P.indexOf(o),r1=x=>Math.round(x),t2=x=>Math.round(x*100)/100;
+  const s={k:'snap',s:G.s,c:Math.round(G.clock*10)/10,b:G.ball,nd:G.need?1:0,m:G.msg,mt:Math.round(G.mt*10)/10,c1:G.ctl1,
+    p:P.map(o=>[r1(o.x),r1(o.y),r1(o.en),o.heat||0,o.jump>0?1:0,o.frz>0?1:0,o.dash>0?1:0]),
+    o:G.ball=='held'?idx(G.own):-1,ev:NET.ev.splice(0)};
+  if(G.fly)s.f={o:idx(G.fly.o),t:t2(G.fly.t),dur:G.fly.dur,fx:r1(G.fly.fx),fy:r1(G.fly.fy),hx:G.fly.hp.x,hy:G.fly.hp.y};
+  if(G.pass)s.ps={f:idx(G.pass.from),to:idx(G.pass.to),t:t2(G.pass.t),dur:G.pass.dur,fx:r1(G.pass.fx),fy:r1(G.pass.fy)};
+  if(G.loose)s.l={x:r1(G.loose.x),y:r1(G.loose.y)};
+  if(G.fight)s.fi={a:idx(G.fight.a),b:idx(G.fight.b),t:t2(G.fight.t),ms:G.fight.ms,cs:G.fight.cs};
+  if(G.ball=='held'&&G.own.t==1)s.hw=t2(hwOf(G.own));
+  return s;
+}
+function netTick(dt){
+  if(!NET||NET.role!='host'||NET.state!='play'||!G||G.over)return;
+  NET.snapT-=dt;if(NET.snapT<=0){NET.snapT=.05;netSend(snap())}
+}
+function switch1(){
+  const o=P[G.ctl1];if(G.ball=='held'&&G.own.t==1)return;
+  const r=G.ball=='held'?G.own:G.ball=='pass'?G.pass.to:G.ball=='fly'?G.fly.hp:G.loose;if(!r)return;
+  const c=T(1).filter(x=>x!==o).sort((a,b)=>dist(a,r)-dist(b,r))[0];if(c)G.ctl1=P.indexOf(c);
+}
+function netMsg(m){
+  if(!m||typeof m!='object'||!NET)return;
+  if(m.k=='bye'){netRemoteLeft();return}
+  if(NET.role=='host'){
+    if(m.k=='ready'){
+      const t=(Array.isArray(m.team)?m.team:[]).slice(0,NET.n).map(cleanP).filter(Boolean);
+      if(t.length!=NET.n)return;NET.theirs=t;NET.state='ready';vOnl();return;
+    }
+    if(NET.state!='play'||!G||G.over)return;
+    const o=P[G.ctl1];if(!o)return;
+    switch(m.k){
+      case 'in':RI.vx=clamp(+m.vx||0,-1,1);RI.vy=clamp(+m.vy||0,-1,1);break;
+      case 'act':if(G.ball=='held'&&G.own.t==0)steal(o);else if(G.ball=='fly'&&G.fly.o.t==0)blockBy(o);break;
+      case 'shoot':if(G.ball=='held'&&G.own===o&&!G.need)shoot(o,clamp(+m.q||0,0,1));break;
+      case 'drib':dribble(o);break;
+      case 'pass':passFor(o,+m.dx||0,+m.dy||0);break;
+      case 'sw':switch1();break;
+      case 'fight':if(G.ball=='fight'&&G.fight.b===o&&G.fight.cs==null)G.fight.cs=clamp(+m.s||0,0,1);break;
+    }
+    return;
+  }
+  switch(m.k){
+    case 'full':onlErr('La sala ya tiene otro jugador.');break;
+    case 'cfg':
+      if(m.v!=NETV){onlErr('Las dos personas deben tener la misma versión del juego.');return}
+      NET.n=[1,2,3,5].includes(m.n)?m.n:3;NET.stake=Math.max(0,Math.min(1000,Math.floor(+m.stake)||0));NET.state='cfgd';vOnl();break;
+    case 'start':guestStart(m);break;
+    case 'snap':if(G&&NET.state=='play')applySnap(m);break;
+    case 'end':guestEnd(m);break;
+  }
+}
+// invitado
+function guestStart(c){
+  if(NET.state=='play')return;
+  const n=[1,2,3,5].includes(c.n)?c.n:3,stake=Math.max(0,Math.min(1000,Math.floor(+c.stake)||0));
+  const t0=(c.t0||[]).slice(0,n).map(cleanP).filter(Boolean),t1=(c.t1||[]).slice(0,n).map(cleanP).filter(Boolean);
+  if(t0.length!=n||t1.length!=n){onlErr('Datos de partida no válidos.');return}
+  if(stake>0&&U){U.tok-=stake;utSave()}
+  NET.stake=stake;NET.n=n;mode=n;FULL=mode==5;H=FULL?752:600;TARGET=FULL?21:11;
+  cv.width=W*2;cv.height=H*2;ctx.setTransform(2,0,0,2,0,0);cv.style.aspectRatio=W+'/'+H;cv.style.height=`min(calc(100dvh - 120px),${H/W*100}vw)`;
+  const mk=(p,t)=>({p,t,x:0,y:0,tx:0,ty:0,init:false,en:100,heat:0,jump:0,frz:0,dash:0,dc:0,bc:0,cd:0,pl:1,st:{pts:0,fg:0,fga:0,t3:0,stl:0,blk:0,reb:0,ast:0}});
+  P=[...t0.map(p=>mk(p,0)),...t1.map(p=>mk(p,1))];
+  G={s:[0,0],clock:FULL?24:12,ball:'held',own:P[0],need:false,chg:false,ch:0,fly:null,loose:null,pass:null,fight:null,msg:'',mt:0,over:false,ctl:P.findIndex(o=>o.t==1),paused:false,bench:[[],[]],all:[...P],hw:.05,lp:null,subsOpen:false};
+  const big=n>2;$('n1').textContent=big?'Tu equipo':t1.map(p=>p.name.split(' ').pop()).join(' · ');$('n2').textContent=big?'Rival':t0.map(p=>p.name.split(' ').pop()).join(' · ');
+  $('s1').textContent=0;$('s2').textContent=0;
+  $('end').style.display='none';$('pause').style.display='none';$('subs').style.display='none';$('onl').style.display='none';$('menu').style.display='none';
+  $('game').style.display='flex';$('tb').style.display=CFG.tb?'flex':'none';$('bC').style.display='none';$('again').style.display='none';$('back').textContent='Salir';
+  NET.state='play';NET.dir=[0,0];NET.sx=0;NET.sy=0;initAudio();
+  last=performance.now();if(!running){running=true;requestAnimationFrame(loop)}
+}
+function applySnap(s){
+  const mx=x=>FULL?W-x:x,my=y=>FULL?H-y:y;
+  G.s=s.s;G.clock=s.c;G.ball=s.b;G.need=!!s.nd;G.msg=String(s.m||'').slice(0,40);G.mt=+s.mt||0;G.hw=+s.hw||G.hw;
+  s.p.forEach((a,i)=>{const o=P[i];if(!o)return;o.tx=mx(a[0]);o.ty=my(a[1]);if(!o.init){o.x=o.tx;o.y=o.ty;o.init=true}o.en=a[2];o.heat=a[3];o.jump=a[4];o.frz=a[5];o.dash=a[6]});
+  G.own=s.o>=0?P[s.o]:null;
+  G.fly=s.f?{o:P[s.f.o],t:s.f.t,dur:s.f.dur,fx:mx(s.f.fx),fy:my(s.f.fy),hp:{x:mx(s.f.hx),y:my(s.f.hy)}}:null;
+  G.pass=s.ps?{from:P[s.ps.f],to:P[s.ps.to],t:s.ps.t,dur:s.ps.dur,fx:mx(s.ps.fx),fy:my(s.ps.fy)}:null;
+  if(s.l){const tx=mx(s.l.x),ty=my(s.l.y);if(G.loose){G.loose.tx=tx;G.loose.ty=ty}else G.loose={x:tx,y:ty,tx,ty}}else G.loose=null;
+  if(s.fi){const old=G.fight,b=P[s.fi.b];G.fight={a:P[s.fi.a],b,t:s.fi.t,ms:s.fi.ms,cs:(old&&old.b===b&&old.cs!=null)?old.cs:s.fi.cs}}else G.fight=null;
+  G.ctl=s.c1>=0?s.c1:G.ctl;
+  $('s1').textContent=G.s[1];$('s2').textContent=G.s[0];
+  (s.ev||[]).forEach(n=>{if(SND[n])sfx(n)});
+}
+function guestUpdate(dt){
+  if(G.mt>0)G.mt-=dt;
+  const k=Math.min(1,dt*14);
+  for(const o of P){o.x+=(o.tx-o.x)*k;o.y+=(o.ty-o.y)*k}
+  if(G.fly)G.fly.t=Math.min(G.fly.dur,G.fly.t+dt);
+  if(G.pass)G.pass.t=Math.min(G.pass.dur,G.pass.t+dt);
+  if(G.fight)G.fight.t+=dt;
+  if(G.loose){G.loose.x+=(G.loose.tx-G.loose.x)*k;G.loose.y+=(G.loose.ty-G.loose.y)*k}
+  const m=me();
+  if(G.chg&&G.ball=='held'&&G.own===m)G.ch=Math.min(1,G.ch+dt/1.3);else G.chg=false;
+  const B=CFG.keys;
+  let vx=(keys.ArrowRight||keys[B.right]?1:0)-(keys.ArrowLeft||keys[B.left]?1:0)+joy.x+padV.x,vy=(keys.ArrowDown||keys[B.down]?1:0)-(keys.ArrowUp||keys[B.up]?1:0)+joy.y+padV.y;
+  const l=Math.hypot(vx,vy);if(l>1){vx/=l;vy/=l}
+  if(FULL){vx=-vx;vy=-vy}
+  NET.dir=[vx,vy];NET.sendT-=dt;
+  if(NET.sendT<=0){netSend({k:'in',vx:+vx.toFixed(2),vy:+vy.toFixed(2)});NET.sendT=.04}
+  const mine=G.ball=='held'&&G.own===m;
+  $('tip').textContent=mine?(G.need?'Sal del arco de tres para poder tirar':'Suelta en la zona verde'):G.ball=='held'?'Defiende: roba o tapona':G.ball=='fight'?'Pulsa cuando la barra pase por el centro':G.ball=='loose'?'Balón suelto: corre a por él':'';
+}
+function gAct(){
+  if(!G||G.over)return;const m=me();
+  if(G.ball=='held'){
+    if(G.own===m){if(G.need){say('Sal del arco para tirar');return}G.chg=true;G.ch=0}
+    else netSend({k:'act'});
+  }else if(G.ball=='fly'){if(G.fly&&G.fly.o.t!=m.t)netSend({k:'act'})}
+  else if(G.ball=='fight'&&G.fight&&G.fight.b===m&&G.fight.cs==null){G.fight.cs=1-Math.abs(fpos(G.fight.t)-.5)*2;netSend({k:'fight',s:G.fight.cs})}
+}
+function gUp(){if(G&&G.chg&&G.ball=='held'&&G.own===me())netSend({k:'shoot',q:qual(G.ch)});if(G)G.chg=false}
+function gPass(){
+  if(!G||G.over)return;const m=me();
+  if(G.ball=='held'&&G.own===m)netSend({k:'pass',dx:NET.dir[0],dy:NET.dir[1]});else netSend({k:'sw'});
+}
+const hwD=()=>NET&&NET.role=='guest'?(G.hw||.05):hwOf(G.own);
+// interfaz del lobby
+function vOnl(){
+  const B=$('onBody'),noPeer=typeof Peer=='undefined';
+  $('onNote').textContent=noPeer?'El online solo funciona en la versión publicada fuera de claude.ai (por ejemplo, en GitHub Pages) y con conexión a internet.':'Uno crea la sala y le da el código al otro. El anfitrión calcula la partida; el otro recibe la imagen y envía sus controles. Hace falta buena conexión (wifi o 4G/5G estable). En 5v5 se juega a 21 y en el resto a 11.';
+  if(!NET){
+    B.innerHTML=`${onlMsg?`<p><b>${onlMsg}</b></p>`:''}
+    <h2>Crear sala</h2><div class="row" id="onF">${[1,2,3,5].map(k=>`<button data-n="${k}" aria-pressed="${onlFmt==k}">${k}v${k}</button>`).join('')}</div>
+    ${U?`<div class="row"><input id="onStake" type="number" min="0" max="1000" value="${U.onStake||0}" style="${INP};width:110px"><span>fichas de apuesta por jugador (0 = sin apuesta). Usa tu plantilla de Ultimate Team.</span></div>`:'<p class="sub">Sin apuesta. Se usará tu selección de Partido rápido (necesitas empezar Ultimate Team para apostar fichas).</p>'}
+    <button class="go" id="onMk" ${noPeer?'disabled':''}>Crear sala</button>
+    <h2>Unirse a una sala</h2><div class="row"><input id="onCode" placeholder="Código de 6 caracteres" maxlength="6" style="${INP};text-transform:uppercase"><button class="go" id="onJoin" ${noPeer?'disabled':''}>Unirse</button></div>`;
+    $('onF').querySelectorAll('button').forEach(b=>b.onclick=()=>{onlFmt=+b.dataset.n;if($('onStake'))U.onStake=+$('onStake').value||0;vOnl()});
+    $('onMk').onclick=()=>{
+      const stake=U?Math.max(0,Math.min(1000,Math.floor(+$('onStake').value)||0)):0;
+      if(stake>U?.tok){onlMsg=`No tienes ${stake} fichas.`;vOnl();return}
+      const t=onlineTeam(onlFmt);if(t.err){onlMsg=t.err;vOnl();return}
+      if(U){U.onStake=stake;utSave()}
+      onlMsg='';hostCreate(onlFmt,stake);
+    };
+    $('onJoin').onclick=()=>{const c=$('onCode').value.trim().toUpperCase();if(!/^[A-Z0-9]{6}$/.test(c)){onlMsg='Código no válido.';vOnl();return}onlMsg='';guestJoin(c)};
+    return;
+  }
+  const N=NET,st=N.stake>0?` · apuesta de ${N.stake} fichas`:'';
+  if(N.role=='host'){
+    if(N.state=='wait')B.innerHTML=`<h2>Sala <span style="letter-spacing:3px">${N.code}</span></h2><p>Formato ${N.n}v${N.n}${st}. Dale este código a tu amigo y espera a que se una…</p><button id="onCancel">Cancelar</button>`;
+    else if(N.state=='conn')B.innerHTML=`<h2>Sala ${N.code}</h2><p>Tu amigo se ha conectado. Esperando a que elija su plantilla…</p><button id="onCancel">Cancelar</button>`;
+    else B.innerHTML=`<h2>Sala ${N.code}</h2><p>Tu rival: ${N.theirs.map(p=>p.name).join(', ')}.</p><button class="go" id="onStart">Empezar partido ${N.n}v${N.n}</button><div class="row"><button id="onCancel">Cancelar</button></div><p class="sub" id="onErr"></p>`;
+    if($('onStart'))$('onStart').onclick=()=>{
+      const t=onlineTeam(N.n);if(t.err){$('onErr').textContent=t.err;return}
+      if(N.stake>0&&(!U||U.tok<N.stake)){$('onErr').textContent=`Necesitas ${N.stake} fichas.`;return}
+      const c={k:'start',t0:t.team,t1:N.theirs,n:N.n,stake:N.stake};netSend(c);hostStart(c);
+    };
+  }else{
+    if(N.state=='joining')B.innerHTML='<p>Conectando con la sala…</p><button id="onCancel">Cancelar</button>';
+    else if(N.state=='cfgd')B.innerHTML=`<h2>Sala ${N.code}</h2><p>Formato ${N.n}v${N.n}${st}.</p><button class="go" id="onReady">Estoy listo (usar mi plantilla)</button><div class="row"><button id="onCancel">Cancelar</button></div><p class="sub" id="onErr"></p>`;
+    else B.innerHTML='<p>Listo. Esperando a que el anfitrión empiece la partida…</p><button id="onCancel">Cancelar</button>';
+    if($('onReady'))$('onReady').onclick=()=>{
+      const t=onlineTeam(N.n);if(t.err){$('onErr').textContent=t.err;return}
+      if(N.stake>0&&(!U||U.tok<N.stake)){$('onErr').textContent=`Necesitas ${N.stake} fichas para entrar.`;return}
+      N.state='ready';netSend({k:'ready',team:t.team});vOnl();
+    };
+  }
+  if($('onCancel'))$('onCancel').onclick=()=>{netSend({k:'bye'});netCleanup();vOnl()};
+}
+$('hO').onclick=onlShow;$('onHome').onclick=()=>{if(NET){netSend({k:'bye'});netCleanup()}goHome()};
+const KACT=[['up','Arriba'],['down','Abajo'],['left','Izquierda'],['right','Derecha'],['shoot','Tirar · Robar · Tapón'],['pass','Pase · Cambiar jugador'],['drib','Regate'],['subs','Banquillo'],['pause','Pausa']];
+let listen=null;
+const kn=e=>e.code=='Space'?'Space':e.key.length==1?e.key.toLowerCase():e.key;
+function keysUI(){
+  $('kl').innerHTML=KACT.map(([a,l])=>`<div class="kr"><span>${l}</span><button data-a="${a}" class="${listen==a?'on':''}">${listen==a?'Pulsa una tecla…':kl(CFG.keys[a])}</button></div>`).join('');
+  document.querySelectorAll('#kl button').forEach(b=>b.onclick=()=>{listen=b.dataset.a;keysUI()});
+}
+function openKeys(v){$('keys').style.display=v?'flex':'none';listen=null;if(v)keysUI()}
+function names(){const big=T(0).length>2;$('n1').textContent=big?'Tu equipo':T(0).map(last1).join(' · ');$('n2').textContent=big?'Rival':T(1).map(last1).join(' · ')}
+let subSel=null;
+function doSub(t,old,nw){
+  const busy=[G.fly&&G.fly.o,G.pass&&G.pass.from,G.pass&&G.pass.to,G.fight&&G.fight.a,G.fight&&G.fight.b];
+  if(busy.includes(old))return false;
+  const i=P.indexOf(old),b=G.bench[t],j=b.indexOf(nw);if(i<0||j<0)return false;
+  Object.assign(nw,{pl:1,x:old.x,y:old.y,spot:null,frz:0,heat:0,dash:0,cd:0,bc:0,dc:0,risk:0,jump:0});
+  P[i]=nw;b[j]=old;if(G.own===old)G.own=nw;if(G.lp&&G.lp.to===old)G.lp=null;names();return true;
+}
+function aiSubs(dt){
+  G.subT-=dt;if(G.subT>0)return;G.subT=1;
+  for(const t of [0,1]){
+    const b=G.bench[t];if(!b.length||(t==0&&!CFG.auto))continue;
+    const tired=T(t).filter(o=>!(t==0&&o===me())&&o!==(G.ball=='held'?G.own:null)).sort((x,y)=>x.en-y.en)[0];
+    const nb=b.reduce((a,c)=>c.en+c.p.ovr*.3>a.en+a.p.ovr*.3?c:a);
+    if(tired&&tired.en<35&&nb.en>tired.en+30&&doSub(t,tired,nb)){G.subT=10;say(t?'Cambio del rival':'Cambio autom\u00e1tico')}
+  }
+}
+function subsUI(){
+  const row=(o,k)=>`<button class="sp${subSel===o?' on':''}" data-k="${k}"><span>${o.p.name} <small>${o.p.pos} · ${o.p.ovr}</small></span><span class="eb"><i style="width:${o.en}%;background:${o.en>35?'#7bdc8a':'#ff7b5c'}"></i></span><span>${Math.round(o.en)}</span></button>`;
+  const c=T(0),b=G.bench[0];
+  $('sc').innerHTML='<h2>En pista</h2>'+c.map((o,i)=>row(o,'c'+i)).join('')+'<h2>Banquillo</h2>'+b.map((o,i)=>row(o,'b'+i)).join('');
+  document.querySelectorAll('#sc .sp').forEach(el=>el.onclick=()=>{
+    const o=(el.dataset.k[0]=='c'?c:b)[+el.dataset.k.slice(1)];
+    if(subSel&&subSel!==o&&P.includes(subSel)!=P.includes(o)){
+      const [old,nw]=P.includes(subSel)?[subSel,o]:[o,subSel];
+      if(!doSub(0,old,nw))say('Ahora no');subSel=null;
+    }else subSel=subSel===o?null:o;
+    subsUI();
+  });
+}
+function openSubs(){if(NET)return;if(!G||G.over||G.paused||!G.bench[0].length)return;G.subsOpen=true;G.paused=true;subSel=null;$('subs').style.display='flex';subsUI()}
+function closeSubs(){G.subsOpen=false;G.paused=false;$('subs').style.display='none';keys={};joy.x=joy.y=0}
+function passOrSwitch(){if(NET&&NET.role=='guest'){gPass();return}
+  if(!G||G.over||G.paused)return;const m=me();
+  if(G.ball=='held'&&G.own===m){const d=m.dir||[0,0];actPass(d[0],d[1])}else switchPlayer();
+}
+addEventListener('keydown',e=>{
+  const k=kn(e);
+  if($('keys').style.display=='flex'){
+    e.preventDefault();
+    if(listen){if(k!='Escape'){const o=KACT.find(([a])=>a!=listen&&CFG.keys[a]==k);if(o)CFG.keys[o[0]]=CFG.keys[listen];CFG.keys[listen]=k;save()}listen=null;keysUI()}
+    else if(k=='Escape')openKeys(0);
+    return;
+  }
+  if(!G)return;const B=CFG.keys;
+  if(G.subsOpen){if(k==B.subs||k=='Escape')closeSubs();return}
+  if(k==B.subs&&!G.paused){openSubs();return}
+  if(k==B.pause||k=='Escape'){togglePause();return}
+  if(G.paused)return;
+  if(k==B.shoot){e.preventDefault();if(!e.repeat)actDown();return}
+  if(!e.repeat){if(k==B.drib)actDrib();if(k==B.pass)passOrSwitch()}
+  keys[k]=1;
+});
+addEventListener('keyup',e=>{const k=kn(e);if(G&&k==CFG.keys.shoot){actUp();return}keys[k]=0});
+cv.addEventListener('pointerdown',e=>{
+  if(!G||G.paused)return;cv.setPointerCapture(e.pointerId);
+  const r=cv.getBoundingClientRect(),right=e.clientX-r.left>r.width/2;
+  if(!right&&joy.id==null){joy.id=e.pointerId;joy.ox=e.clientX;joy.oy=e.clientY}
+  else if(right&&!tch)tch={id:e.pointerId,y:e.clientY,done:false};
+});
+cv.addEventListener('pointermove',e=>{
+  if(e.pointerId===joy.id){joy.x=clamp((e.clientX-joy.ox)/CFG.sens,-1,1);joy.y=clamp((e.clientY-joy.oy)/CFG.sens,-1,1)}
+  else if(tch&&e.pointerId===tch.id&&!tch.done&&tch.y-e.clientY>40){tch.done=true;actDrib()}
+});
+const endP=e=>{if(e.pointerId===joy.id){joy.id=null;joy.x=joy.y=0}if(tch&&e.pointerId===tch.id)tch=null};
+cv.addEventListener('pointerup',endP);cv.addEventListener('pointercancel',endP);
+const bA=$('bA');bA.addEventListener('pointerdown',e=>{e.preventDefault();actDown()});
+['pointerup','pointercancel','pointerleave'].forEach(n=>bA.addEventListener(n,actUp));
+$('bB').addEventListener('pointerdown',e=>{e.preventDefault();passOrSwitch()});
+$('bC').addEventListener('pointerdown',e=>{e.preventDefault();openSubs()});
+$('snd').checked=!!CFG.snd;$('sens').value=CFG.sens;
+$('snd').onchange=e=>{CFG.snd=e.target.checked?1:0;save()};$('sens').oninput=e=>{CFG.sens=+e.target.value;save()};
+$('swm').onchange=e=>{CFG.sw=e.target.value;save();menu()};$('sw').onclick=switchPlayer;$('sclose').onclick=closeSubs;$('bn2').onclick=()=>{if(G&&G.bench[0].length){G.paused=false;$('pause').style.display='none';openSubs()}};$('aut').checked=!!CFG.auto;$('aut').onchange=e=>{CFG.auto=e.target.checked?1:0;save()};$('kb').onclick=$('kb2').onclick=()=>openKeys(1);$('kback').onclick=()=>openKeys(0);$('kdef').onclick=()=>{CFG.keys={...DEFK};save();keysUI()};$('tbs').checked=!!CFG.tb;$('tbs').onchange=e=>{CFG.tb=e.target.checked?1:0;save();$('tb').style.display=CFG.tb?'flex':'none'};$('pz').onclick=togglePause;$('resume').onclick=togglePause;
+$('quit').onclick=()=>{if(NET){$('pause').style.display='none';netForfeit();return}G.paused=false;$('pause').style.display='none';if(UTM&&!G.over){G.over=true;utEnd(1,true)}$('back').onclick()};
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&G&&!G.paused&&!NET)togglePause()});
+$('play').onclick=start;$('again').onclick=start;
+$('back').onclick=()=>{if(NET){netLeave();return}G=null;$('game').style.display='none';if(UTM)utBack();else $('menu').style.display='block'};
+</script></body></html>
